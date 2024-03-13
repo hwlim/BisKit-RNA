@@ -1,0 +1,309 @@
+########################
+## Basic parameters
+
+
+## Sample information file with five columns: id / name / group / fq1 / fq2
+src_sampleInfo	= "sample.tsv"
+cluster_yml		= os.environ["BISKIT_PATH"] + "/Snakemake/cluster.yml"
+
+## Regular expressions for chromosome names
+## Target chromosomes + spikein chromosome (if needed)
+## This is also useful in excluding all the scaffold and random chromosomes
+chrRegex	= "^chr[0-9XY]+$"
+
+
+#########################
+## Directories
+fastq_dir	= "0.Fastq"			# Directory containing fastq files
+trim_dir	= "0.Fastq.Trim"	# Directory for trimmed fastq files
+sample_dir 	= "1.Sample"
+plot_dir 	= "1.Sample_Plots"
+per_sample_plot_dir = "Plots"
+per_pairwise_plot_dir = "Plots"
+rRNA_dir 	= "1.rRNA"
+tRNA_dir 	= "2.tRNA"
+miRNA_dir 	= "3.miRNA"
+piRNA_dir	= "4.piRNA"
+genome_dir 	= "5.genome"
+circRNA_dir 	= "6.circRNA"
+compare_dir 	= "2.Diff"
+combined_compare_dir = "3.combined_Diff"
+mqc_dir = "4.multiQC"
+mqc_yaml = os.environ["BISKIT_PATH"] + "/Config/MultiQC_config.yaml"
+
+################################################
+## Loading sample Information & cluster config
+
+## Sample table
+import pandas as pd
+import sys
+import os
+import yaml
+samples = pd.read_csv(src_sampleInfo, sep="\t", comment="#", na_filter=False)
+
+## Cluster configuration
+with open(os.path.expanduser(cluster_yml), 'r') as fh:
+	cluster = yaml.safe_load(fh)
+
+## Comparison information
+config_PW = "config.bis.yml"
+
+with open(os.path.expanduser(config_PW), 'r') as fh:
+	config_pw = yaml.safe_load(fh)
+
+# diffPairNameL = list(config_pw['diff_pair_list'].keys())
+
+try:
+    diffPairNameL = list(config_pw['diff_pair_list'].keys())
+except AttributeError:
+    # Code to handle the AttributeError
+	diffPairNameL = ""
+	print("Pipeline will not be performing pairwise comparisons; check the config.bis.yml file if this is not what you intend to do.")
+
+
+## parse parameters fron the config.bis.yml file
+ref_dir = config_pw['params']['ref_dir']
+## reference data
+species = ref_dir.split("/")[-1]
+rRNA_fa = f"{ref_dir}/rRNA/rRNA.fa"
+rRNA_index = f"{ref_dir}/rRNA/index_HISAT2-3N/rRNA"
+tRNA_fa = f"{ref_dir}/tRNA/tRNA.fa"
+tRNA_index = f"{ref_dir}/tRNA/index_HISAT2-3N/tRNA"
+tRNA_gtf = f"{ref_dir}/tRNA/tRNA.gtf"
+miRNA_hairpin_fa = f"{ref_dir}/miRNA/miRNA.fa"
+miRNA_hairpin_index = f"{ref_dir}/miRNA/index_HISAT2-3N/miRNA"
+miRNA_gtf = f"{ref_dir}/miRNA/miRNA.gtf"
+piRNA_fa = f"{ref_dir}/piRNA/piRNA.fa"
+piRNA_index = f"{ref_dir}/piRNA/index_HISAT2-3N/piRNA"
+piRNA_gtf = f"{ref_dir}/piRNA/piRNA.gtf"
+genome_fa = f"{ref_dir}/Genome/genome.fa"
+genome_index = f"{ref_dir}/Genome/index_HISAT2-3N/genome"
+genome_bed = f"{ref_dir}/Genome/genome.gtf"
+chrom_size = f"{ref_dir}/Genome/chrom.size"
+lookup_table = f"{ref_dir}/lookupTable.tsv"
+circRNA_fa = f"{ref_dir}/circRNA/circRNA.fa"
+circRNA_index = f"{ref_dir}/circRNA/index_HISAT2-3N/circRNA"
+circRNA_gtf = f"{ref_dir}/circRNA/circRNA.gtf"
+
+cov_thresh = config_pw['params']['coverage_threshold']
+mr_thresh = config_pw['params']['methylation_rate_threshold']
+diff_thresh = config_pw['params']['differential_threshold']
+sig_type_call = config_pw['params']['statistical_significance_call']
+sig_thresh_call = config_pw['params']['statistical_threshold_call']
+sig_type_diff = config_pw['params']['statistical_significance_diff']
+sig_thresh_diff = config_pw['params']['statistical_threshold_diff']
+min_reps = config_pw['params']['minimum_replicates']
+min_C_count = config_pw['params']['minimum_C_count']
+coverage_filtered_dir = "cov"+str(cov_thresh)
+soft_clipping = config_pw['params']['soft_clipping']
+if soft_clipping == True:
+	soft_clip = ''
+else:
+	soft_clip = '--no-softclip'
+
+## adapter trimming
+adapter = config_pw['params']['adapter']
+if adapter != "NULL":
+	doTrim = True
+	adapterSeq = ""
+	for sequence in adapter:
+		adapterSeq += f"-a {sequence} "
+	opt_cutadapt = config_pw['params']['opt_cutadapt']
+else:
+	doTrim = False
+
+## Deduplication
+do_dedup = config_pw['params']['doDedup']
+
+## Regular expressions for chromosome names
+chrRegexTarget	= config_pw['params']['chrRegexTarget']
+
+#################################################
+## Configuration & sample sheet validation
+include: os.environ["BISKIT_PATH"] + "/Snakemake/validate.smk"
+cov_thresh = str(cov_thresh)
+sig_thresh_call = str(sig_thresh_call)
+sig_thresh_diff = str(sig_thresh_diff)
+diff_thresh = str(diff_thresh)
+
+### Sample list and types (No need to change) 
+# All sample names (Name field in sample.tsv file)
+sample_list = samples.Name.tolist()
+
+#########################
+## Rules start
+if doTrim:
+	trim = expand(trim_dir + "/{sampleName}_se.trim.fq.gz", sampleName=sample_list)
+	trimming = [trim]
+else:
+	trimming = []
+
+rule all:
+	input:
+		## Alignment and m5C call
+		## rRNA output
+		trimming,
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+		expand(mqc_dir + "/m-bias_rRNA_{sampleName}.tsv", sampleName=sample_list),
+
+		## tRNA output
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+		expand(mqc_dir + "/m-bias_tRNA_{sampleName}.tsv", sampleName=sample_list),
+
+		## miRNA output
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+		expand(mqc_dir + "/m-bias_miRNA_{sampleName}.tsv", sampleName=sample_list),
+
+		## piRNA output
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+		expand(mqc_dir + "/m-bias_piRNA_{sampleName}.tsv", sampleName=sample_list),
+
+		## genome output
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_all.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_uniq.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+		expand(mqc_dir + "/m-bias_genome_{sampleName}.tsv", sampleName=sample_list),
+
+		## circRNA output
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
+		expand(mqc_dir + "/m-bias_circRNA_{sampleName}.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/readStats.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/mpileup_out_raw_all.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/mpileup_out_raw_uniq.tsv", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.tsv", sampleName=sample_list, pre=["call", "call_stats" , "call_stats_simplified"]),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/call_" + coverage_filtered_dir + "/{pre}.png", sampleName=sample_list, pre=["log2_cov", "methRate", "log2_cov_"+sig_type_call, "methRate_"+sig_type_call]),
+
+		## merge results by sample
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/mergedAlignStats.tsv", sampleName=sample_list),
+		expand(mqc_dir + "/{src}_alignStats.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
+		expand(sample_dir + "/{sampleName}/featureCounts.tsv", sampleName=sample_list),
+		sample_dir + "/featureCounts.tsv",
+
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/mergedCallStats.tsv", sampleName=sample_list),
+		expand(mqc_dir + "/{src}_callStats.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
+		expand(mqc_dir + "/{src}_callStats_sigNonsig.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
+		mqc_dir + "/callStats_all.tsv",
+		mqc_dir + "/callStats_sigNonsig.tsv",
+
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/mergedCandidates.tsv", sampleName=sample_list),
+
+		## draw candidate profile as bigwig
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/plus.bw", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/minus.bw", sampleName=sample_list),
+
+		## Draw proportion of significant m5C candidates
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/" + per_sample_plot_dir + "/Significant_Candidate_{ext}", sampleName=sample_list, ext=["Percentage.pdf", "Percentage.png", "Count.pdf", "Count.png"]),
+
+		## draw read stratification
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/" + per_sample_plot_dir + "/Read_Stratification_With{ext}", sampleName=sample_list, ext=["out_Unaligned.pdf", "out_Unaligned.png", "_Unaligned.pdf", "_Unaligned.png"]),
+		expand(plot_dir + "/Read_Stratification_Count{ext}", ext=[".pdf", ".png"]),
+		expand(plot_dir + "/Read_Stratification_Percentage{ext}", ext=[".pdf", ".png"]),
+		expand(mqc_dir + "/Read_Stratification_{suf}.tsv", suf = ["All", "Aligned"]),
+
+		expand(mqc_dir + "/{src}_catStats.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
+		expand(mqc_dir + "/{src}_catStats_updown.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
+
+		## draw m5C stratification
+		expand(sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/" + per_sample_plot_dir + "/Candidate_Stratification{ext}", sampleName=sample_list, ext=["_(All).pdf", "_(All).png", "_(" + sig_type_call + ").pdf", "_(" + sig_type_call + ").png", "_(" + sig_type_call + ")_(Annotated).pdf", "_(" + sig_type_call + ")_(Annotated).png"]),
+		expand(plot_dir + "/Candidate_Stratification_{ext}", sampleName=sample_list, ext=["Count_(All).pdf", "Count_(All).png", "Percentage_(All).pdf", "Percentage_(All).png"]),
+		expand(plot_dir + "/Candidate_Stratification_{ext}", sampleName=sample_list, ext=["Count_(Significant).pdf", "Count_(Significant).png", "Percentage_(Significant).pdf", "Percentage_(Significant).png"]),
+		expand(plot_dir + "/Candidate_Stratification_{ext}", sampleName=sample_list, ext=["Count_(Annotated).pdf", "Count_(Annotated).png", "Percentage_(Annotated).pdf", "Percentage_(Annotated).png"]),
+		expand(plot_dir + "/Significant_Candidate_{ext}", sampleName=sample_list, ext=["Count.pdf", "Count.png", "Percentage.pdf", "Percentage.png"]),
+
+		## Compare call results
+		## compare candidates between all samples
+		expand(compare_dir + "/{diffPairName}/pairwise_comparison.tsv", diffPairName=diffPairNameL),
+
+		## categorize pairwise comparisons
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/categorized_pairwise_comparison.tsv", diffPairName=diffPairNameL),
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/stats.tsv", diffPairName=diffPairNameL),
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/{pre}.png", diffPairName=diffPairNameL, pre=["methRate_log2foldChange", "methRate_log2foldChange_"+sig_type_diff,"delta_methRate", "delta_methRate_"+sig_type_diff]),
+		
+		## Draw categorization by source for each pairwise comparison
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source_{ext}_{cat}", diffPairName=diffPairNameL,  ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf", "(Single).png", "(Single).pdf"]),
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source.tsv", diffPairName=diffPairNameL),
+		expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Categorization_By_Source_For_All_Pairwise_Comparisons.tsv", diffPairName=diffPairNameL),
+
+		## Draw general categorization between all pairwise
+		expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Differential_Analysis_Categorization_{ext}_{cat}", ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf"]),
+		mqc_dir + "/Differential_Analysis_Categorization.tsv",
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/volcano{ext}", diffPairName=diffPairNameL, ext=[".png", ".pdf"]),
+		mqc_dir + "/Volcano_Plots.png",
+
+		## combined compare results
+		combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/all_sample_comparisons.tsv",
+
+		## get line graph coords for delta MethylRate distribution plot in MultiQC
+		expand(mqc_dir + "/delta_MR_{diffPairName}.tsv", diffPairName=diffPairNameL),
+
+		## Create MultiQC Report
+		"multiqc_report.html"
+
+## Include Snakemake rules from separate files
+include: os.environ["BISKIT_PATH"] + "/Snakemake/rules.smk"

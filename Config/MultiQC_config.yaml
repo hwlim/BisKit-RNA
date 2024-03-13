@@ -1,0 +1,758 @@
+#######################################
+# Example MultiQC Configuration File
+#######################################
+
+# This file can be saved either in the MultiQC installation
+# directory, or as ~/.multiqc_config.yaml
+
+# Configuration settings are taken from the following locations, in order:
+# - Hardcoded in MultiQC (multiqc/utils/config.py)
+# - <installation_dir>/multiqc_config.yaml
+# - ~/.multiqc_config.yaml
+# - Command line options
+
+# Note that all of the values below are set to the MultiQC defaults.
+# It's recommended that you delete any that you don't need.
+
+---
+# Title to use for the report.
+title: BisKit Bisulfite Sequencing Data Analysis
+report_comment: "BisKit Report"
+
+# Prepend sample names with their directory. Useful if analysing the
+# sample samples with different parameters.
+prepend_dirs: false
+
+# Default output filenames
+output_fn_name: multiqc_report.html
+data_dir_name: multiqc_data
+
+# Whether to create the parsed data directory in addition to the report
+make_data_dir: False
+
+# Cleaning options for sample names. Typically, sample names are detected
+# from an input filename. If any of these strings are found, they and any
+# text to their right will be discarded.
+# For example - file1.fq.gz_trimmed.bam_deduplicated_fastqc.zip
+# would be cleaned to 'file1'
+# Two options here - fn_clean_exts will remove the defaults,
+# extra_fn_clean_exts will append to the defaults
+extra_fn_clean_exts:
+  - .gz
+  - .fastq
+  - .fq
+  - .bam
+  - .sam
+  - _star_aligned
+  - _fastqc
+  - type: remove
+    pattern: ".sorted"
+  - type: regex
+    pattern: '^Sample_\d+'
+  - type: regex_keep
+    pattern: "[A-Z]{3}[1-9]{4}[A,B][1-9]"
+
+# Ignore these files / directories / paths when searching for logs
+fn_ignore_files:
+  - submit.*
+  - sample.tsv
+  - .DS_Store
+fn_ignore_dirs:
+  - .snakemake
+  - .config
+  - .cache
+  - .Rhistory
+  - 0.Fastq
+fn_ignore_paths:
+  - logs
+
+custom_data:
+  Alignment_Stats:
+    parent_id: Alignment_Stats
+    parent_name: "Alignment Statistics"
+  readStratAll:
+    parent_id: Alignment_Stats
+    section_name: "Read Stratification (All)"
+    description: "Read Stratification By Source (All)"
+    plot_type: 'bargraph'
+    pconfig:
+      title: "Read Stratification (All)"
+  readStratAligned:
+    parent_id: Alignment_Stats
+    section_name: "Read Stratification (Aligned)"
+    description: "Read Stratification By Source (Aligned)"
+    plot_type: 'bargraph'
+    pconfig:
+      title: "Read Stratification (Aligned)"
+  rRNAalign:
+    parent_id: Alignment_Stats
+    section_name: "rRNA Alignment"
+    description: "rRNA Alignment by Sample"
+    plot_type: 'bargraph'
+  tRNAalign:
+    parent_id: Alignment_Stats
+    section_name: "tRNA Alignment"
+    description: "tRNA Alignment by Sample"
+    plot_type: 'bargraph'
+  miRNAalign:
+    parent_id: Alignment_Stats
+    section_name: "miRNA Alignment"
+    description: "miRNA Alignment by Sample"
+    plot_type: 'bargraph'
+  piRNAalign:
+    parent_id: Alignment_Stats
+    section_name: "piRNA Alignment"
+    description: "piRNA Alignment by Sample"
+    plot_type: 'bargraph'
+  genomealign:
+    parent_id: Alignment_Stats
+    section_name: "Genome Alignment"
+    description: "Genome Alignment by Sample"
+    plot_type: 'bargraph'
+  circRNAalign:
+    parent_id: Alignment_Stats
+    section_name: "circRNA Alignment"
+    description: "circRNA Alignment by Sample"
+    plot_type: 'bargraph'
+
+  m-bias_plots:
+    parent_id: m-bias_plots
+    parent_name: "M-Bias Plots"
+  m-Bias_plot_rRNA:
+    parent_id: m-bias_plots
+    section_name: "rRNA M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_rRNA'
+        title: 'rRNA M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+  m-Bias_plot_tRNA:
+    parent_id: m-bias_plots
+    section_name: "tRNA M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_tRNA'
+        title: 'tRNA M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+  m-Bias_plot_miRNA:
+    parent_id: m-bias_plots
+    section_name: "miRNA M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_miRNA'
+        title: 'miRNA M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+  m-Bias_plot_piRNA:
+    parent_id: m-bias_plots
+    section_name: "piRNA M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_piRNA'
+        title: 'piRNA M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+  m-Bias_plot_genome:
+    parent_id: m-bias_plots
+    section_name: "Genome M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_genome'
+        title: 'Genome M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+  m-Bias_plot_circRNA:
+    parent_id: m-bias_plots
+    section_name: "circRNA M-Bias Plot"
+    file_format: 'tsv'
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'mbias_plot_genome'
+        title: 'circRNA M-Bias Plot (Forward)'
+        ylab: 'Methylation Rate (%)'
+        xlab: 'Position in Read'
+        xmin: 1
+        ymax: 100
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+
+  Call_Stats:
+    parent_id: Call_Stats
+    parent_name: "Call Statistics"
+  sigcall:
+    parent_id: Call_Stats
+    section_name: "All Call Stats (Plot)"
+    description: "All Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  allcallTable:
+    parent_id: Call_Stats
+    section_name: "All Call Stats (Table)"
+    description: "All Call Stats Table by Sample"
+    plot_type: 'table' 
+    pconfig:
+      format: '{:,.0f}'
+  rRNAcall:
+    parent_id: Call_Stats
+    section_name: "rRNA Call Stats (Plot)"
+    description: "rRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  rRNAcallTable:
+    parent_id: Call_Stats
+    section_name: "rRNA Call Stats (Table)"
+    description: "rRNA Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+  tRNAcall:
+    parent_id: Call_Stats
+    section_name: "tRNA Call Stats (Plot)"
+    description: "tRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  tRNAcallTable:
+    parent_id: Call_Stats
+    section_name: "tRNA Call Stats (Table)"
+    description: "tRNA Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+  miRNAcall:
+    parent_id: Call_Stats
+    section_name: "miRNA Call Stats (Plot)"
+    description: "miRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  miRNAcallTable:
+    parent_id: Call_Stats
+    section_name: "miRNA Call Stats (Table)"
+    description: "miRNA Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+  piRNAcall:
+    parent_id: Call_Stats
+    section_name: "piRNA Call Stats (Plot)"
+    description: "piRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  piRNAcallTable:
+    parent_id: Call_Stats
+    section_name: "piRNA Call Stats (Table)"
+    description: "piRNA Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+  genomecall:
+    parent_id: Call_Stats
+    section_name: "Genome Call Stats (Plot)"
+    description: "Genome Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  genomecallTable:
+    parent_id: Call_Stats
+    section_name: "Genome Call Stats (Table)"
+    description: "Genome Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+  circRNAcall:
+    parent_id: Call_Stats
+    section_name: "circRNA Call Stats (Plot)"
+    description: "circRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    plot_type: 'bargraph'
+  circRNAcallTable:
+    parent_id: Call_Stats
+    section_name: "circRNA Call Stats (Table)"
+    description: "circRNA Call Stats Table by Sample"
+    plot_type: 'table'
+    pconfig:
+      format: '{:,.0f}'
+
+  Diff_Stats:
+    parent_id: Diff_Stats
+    parent_name: "Differential Analysis"
+  allDiff:
+    parent_id: Diff_Stats
+    section_name: "Differential Analysis Statistics"
+    description: "Differential Analysis Statistics for all Pairwise Comparisons"
+  rRNAcat:
+    parent_id: Diff_Stats
+    section_name: "rRNA Categorization (All)"
+    description: "rRNA Categorization Statistics after Differential Analysis"
+  rRNAupdown:
+    parent_id: Diff_Stats
+    section_name: "rRNA Categorization (UP vs DOWN)"
+  tRNAcat:
+    parent_id: Diff_Stats
+    section_name: "tRNA Categorization (All)"
+    description: "tRNA Categorization Statistics after Differential Analysis"
+  tRNAupdown:
+    parent_id: Diff_Stats
+    section_name: "tRNA Categorization (UP vs DOWN)"
+  miRNAcat:
+    parent_id: Diff_Stats
+    section_name: "miRNA Categorization (All)"
+    description: "miRNA Categorization Statistics after Differential Analysis"
+  miRNAupdown:
+    parent_id: Diff_Stats
+    section_name: "miRNA Categorization (UP vs DOWN)"
+  piRNAcat:
+    parent_id: Diff_Stats
+    section_name: "piRNA Categorization (All)"
+    description: "piRNA Categorization Statistics after Differential Analysis"
+  piRNAupdown:
+    parent_id: Diff_Stats
+    section_name: "piRNA Categorization (UP vs DOWN)"
+  genomecat:
+    parent_id: Diff_Stats
+    section_name: "Genome Categorization (All)"
+    description: "Genome Categorization Statistics after Differential Analysis"
+  genomeupdown:
+    parent_id: Diff_Stats
+    section_name: "Genome Categorization (UP vs DOWN)"
+  circRNAcat:
+    parent_id: Diff_Stats
+    section_name: "circRNA Categorization (All)"
+    description: "circRNA Categorization Statistics after Differential Analysis"
+  circRNAupdown:
+    parent_id: Diff_Stats
+    section_name: "circRNA Categorization (UP vs DOWN)"
+
+  Distribution_plots:
+    parent_id: distPlots
+    parent_name: "Distribution Plots"
+    file_format: 'tsv'
+    description: "Delta methylation rate distribution for each pairwise comparison (significant m5C locations only; X_vs_Y means Y - X )"
+    plot_type: 'linegraph'
+    pconfig:
+        id: 'deltaMR_dist_lineplot'
+        title: 'Delta Methylation Rate Distribution'
+        ylab: 'Density'
+        xlab: 'Delta Methylation Rate'
+        xmin: -1
+        xmax: 1
+        tt_label: '{point.x:.2f}: {point.y:.2f}'
+        use_legend: True
+
+  Volcano_plots:
+    parent_id: volcanoPlots
+    parent_name: "Volcano Plots"
+    description: "Volcano plots for each pairwise comparison"
+
+sp:
+
+  readStratAll:
+    fn: "Read_Stratification_All.tsv"
+  readStratAligned:
+    fn: "Read_Stratification_Aligned.tsv"
+  rRNAalign:
+    fn: "rRNA_alignStats.tsv"
+  tRNAalign:
+    fn: "tRNA_alignStats.tsv"
+  miRNAalign:
+    fn: "miRNA_alignStats.tsv"
+  piRNAalign:
+    fn: "piRNA_alignStats.tsv"
+  genomealign:
+    fn: "Genome_alignStats.tsv"
+  circRNAalign:
+    fn: "circRNA_alignStats.tsv"
+  sigcall:
+    fn: "callStats_sigNonsig.tsv"
+  allcallTable:
+    fn: "callStats_all.tsv"
+  rRNAcall:
+    fn: "rRNA_callStats_sigNonsig.tsv"
+  rRNAcallTable:
+    fn: "rRNA_callStats.tsv"
+  tRNAcall:
+    fn: "tRNA_callStats_sigNonsig.tsv"
+  tRNAcallTable:
+    fn: "tRNA_callStats.tsv"
+  miRNAcall:
+    fn: "miRNA_callStats_sigNonsig.tsv"
+  miRNAcallTable:
+    fn: "miRNA_callStats.tsv"
+  piRNAcall:
+    fn: "piRNA_callStats_sigNonsig.tsv"
+  piRNAcallTable:
+    fn: "piRNA_callStats.tsv"
+  genomecall:
+    fn: "Genome_callStats_sigNonsig.tsv"
+  genomecallTable:
+    fn: "Genome_callStats.tsv"
+  circRNAcall:
+    fn: "circRNA_callStats_sigNonsig.tsv"
+  circRNAcallTable:
+    fn: "circRNA_callStats.tsv"
+  allDiff:
+    fn: "Differential_Analysis_Categorization.tsv"
+  rRNAcat:
+    fn: "rRNA_catStats.tsv"
+  rRNAupdown:
+    fn: "rRNA_catStats_updown.tsv"
+  tRNAcat:
+    fn: "tRNA_catStats.tsv"
+  tRNAupdown:
+    fn: "tRNA_catStats_updown.tsv"
+  miRNAcat:
+    fn: "miRNA_catStats.tsv"
+  miRNAupdown:
+    fn: "miRNA_catStats_updown.tsv"
+  piRNAcat:
+    fn: "piRNA_catStats.tsv"
+  piRNAupdown:
+    fn: "piRNA_catStats_updown.tsv"
+  genomecat:
+    fn: "Genome_catStats.tsv"
+  genomeupdown:
+    fn: "Genome_catStats_updown.tsv"
+  circRNAcat:
+    fn: "circRNA_catStats.tsv"
+  circRNAupdown:
+    fn: "circRNA_catStats_updown.tsv"
+  Distribution_plots:
+    fn: 'delta_MR_*'
+  Volcano_plots:
+    fn: "Volcano_Plots.png"
+  m-Bias_plot_rRNA:
+    fn: 'm-bias_rRNA_*'
+  m-Bias_plot_tRNA:
+    fn: 'm-bias_tRNA_*'
+  m-Bias_plot_miRNA:
+    fn: 'm-bias_miRNA_*'
+  m-Bias_plot_piRNA:
+    fn: 'm-bias_piRNA_*'
+  m-Bias_plot_genome:
+    fn: 'm-bias_genome_*'
+  m-Bias_plot_circRNA:
+    fn: 'm-bias_circRNA_*'
+  
+custom_plot_config:
+  
+  readStratAll-plot:
+    rRNA:
+      color: '#49bcf2'
+    tRNA:
+      color: '#2fd835'
+    miRNA:
+      color: '#2f3dd8'
+    piRNA:
+      color: '#d82fb6'
+    Genome:
+      color: '#e8fc2d'
+    circRNA:
+      color: '#fcc52d'
+    Unaligned:
+      color: 'grey'
+  readStratAligned-plot:
+    rRNA:
+      color: '#49bcf2'
+    tRNA:
+      color: '#2fd835'
+    miRNA:
+      color: '#2f3dd8'
+    piRNA:
+      color: '#d82fb6'
+    Genome:
+      color: '#e8fc2d'
+    circRNA:
+      color: '#fcc52d'
+  rRNAalign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  tRNAalign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  miRNAalign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  piRNAalign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  genomealign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  circRNAalign-plot:
+    Uniquely Aligned:
+      color: '#49bcf2'
+    Multi-Aligned:
+      color: '#44e3a6'
+    Unaligned:
+      color: 'grey'
+  
+  sigcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'
+  rRNAcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+  tRNAcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+  miRNAcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+  piRNAcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+  genomecall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+  circRNAcall-plot:
+    Significant Candidates:
+      color: '#49bcf2'
+    Non-Significant Candidates:
+      color: 'grey'    
+
+  allDiff-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    uniq1:
+      color: 'green'
+    uniq2:
+      color: 'yellow'
+  rRNAcat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  rRNAupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  tRNAcat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  tRNAupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  miRNAcat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  miRNAupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  piRNAcat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  piRNAupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  genomecat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  genomeupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  circRNAcat-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+  circRNAupdown-plot:
+    UP:
+      color: 'red'
+    DOWN:
+      color: 'blue'
+    UNCHANGED:
+      color: 'grey'
+    UNIQ1:
+      color: 'green'
+    UNIQ2:
+      color: 'yellow'
+
+ignore_images: false
+
+# Ignore files larger than this when searching for logs (bytes)
+log_filesize_limit: 5000000
+
+# MultiQC skips a couple of debug messages when searching files as the
+# log can get very verbose otherwise. Re-enable here to help debugging.
+report_readerrors: False
+report_imgskips: False
+
+# Opt-out of remotely checking that you're running the latest version
+no_version_check: False
+
+# How to plot graphs. Different templates can override these settings, but
+# the default template can use interactive plots (Javascript using HighCharts)
+# or flat plots (images, using MatPlotLib). With interactive plots, the report
+# can prevent automatically rendering all graphs if there are lots of samples
+# to prevent the browser being locked up when the report opens.
+plots_force_flat: False # Try to use only flat image graphs
+plots_force_interactive: False # Try to use only interactive javascript graphs
+plots_flat_numseries: 100 # If neither of the above, use flat if > this number of datasets
+num_datasets_plot_limit: 50 # If interactive, don't plot on load if > this number of datasets
+max_table_rows: 500 # Swap tables for a beeswarm plot above this
+
+# Overwrite module filename search patterns. See multiqc/utils/search_patterns.yaml
+# for the defaults. Remove a default by setting it to null.
+
+
+# Specify a custom logo to add to reports (uncomment to use)
+custom_logo: null # '/path/to/logo.png'
+custom_logo_url: null # 'https://www.example.com'
+custom_logo_title: null # 'Our Institute Name'
+subtitle: null # Grey text below title
+intro_text: null # Set to False to remove, or your own text
+
+# Specify custom css to add to the report
+custom_css_files: []
+
+# Add generic information to the top of reports
+report_header_info:
+  - BisKit Pipeline: 'See <a href="https://github.com/hwlim/BisKit" target="_blank">BisKit Github</a> for information regarding the pipeline.'
+
+# Overwrite the defaults of which table columns are visible by default
+table_columns_visible:
+  FastQC:
+    percent_fails: False
+    total_sequences: True
+
+# Overwrite the default table column names
+table_columns_name:
+  FastQC:
+    percent_fails: "Percent not pass"

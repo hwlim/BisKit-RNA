@@ -1,0 +1,75 @@
+
+
+## List of group pairs to compare for alternative splicing analysis
+diff_pair_list:
+    Sample1_vs_Sample2:
+        - Sample1
+        - Sample2
+    Sample2_vs_Sample3:
+        - Sample1
+        - Sample3
+    Sample1_vs_Sample3:
+        - Sample2
+        - Sample3
+
+## parameters
+params:
+    ## docker container
+    ## you can either set the container variable to "NULL" or path to the container file you downloaded manually.
+    ## If set to "NULL", snakemake will automatically download the container from docker and store it in the working directory.
+    ## If set to a path to the downloaded container, you can keep a single copy of the container and save disk space in the long run.
+    ## If set to a path to the downloaded container, you need to download the docker container manually and designate the path (in quotation marks) to the container in the 'container_path' variable.
+    ## To download the container manually, use 'singularity pull /your/path/biskit.sif docker://ahnsf9/biskit:1.0.4'. Check https://github.com/hwlim/bisKit for details.
+    container_path: "NULL"
+
+    ## reference directory that contains reference FA files, index, bed etc.
+    ref_dir: "/Genomes/mm10"
+
+    ## adapter trimming; set as "NULL" if you do not want to perform trimming.
+    ## Add the '-a' in front of the adapter as shown in the default setting below.
+    ## Multiple adapter sequences can be added by adding the '-a' flag in front of the sequence as shown in the default setting below. 
+    ## illumina universal adapter = "-a AGATCGGAAGAGC"
+    ## illumina small RNA adapter = "-a TGGAATTCTCGGGTGCCAAGG"
+    ## Nextera adapter for ATAC-seq or Cut&Tag = "-a CTGTCTCTTATA"
+    adapter: ["AGATCGGAAGAGC", "TGGAATTCTCGGGTGCCAAGG"]
+
+    ## additional options for cutadapt; follow cutadapt syntax. Leave as empty quotes if no additional options are being used.
+    ## default parameters: minimum fragment length 18, minimum quality 20 for quality trimming
+    opt_cutadapt: "--minimum-length 18 -q 20"
+
+    ## softclipping during alignment; enter 'True' to allow soft-clipping or 'False' to prevent soft-clipping, without the quotation marks
+    soft_clipping: True
+
+    ## deduplication
+    doDedup: False
+
+    ## Regular expressions for target chromosomes
+    chrRegexTarget: "^chr[0-9XY]+$"
+
+    ## threshold for minimum coverage for a C to be considered a potential candidate
+    coverage_threshold: 10
+    
+    ## threshold for minimum methylation rate for a C to be considered a potential candidate
+    methylation_rate_threshold: 0.1
+    
+    ## threshold for minimum difference between two samples at a C location to be considered a significant candidate
+    differential_threshold: 0.05
+
+    ## type of statistical significant to be used for the call step; it can be either 'pVal' or 'FDR'
+    statistical_significance_call: pVal
+    
+    ## value of statistical threshold for the call step
+    statistical_threshold_call: 0.05
+    
+    ## minimum replicates a C position has to be seen to be considered a candidate. Enter the value '1' if you have no replicates.
+    ## The number of sample replicates should always be higher than or equal to the number of control replicates.
+    minimum_replicates: 2
+
+    ## minimum C count needed for a C position to be considered a candidate
+    minimum_C_count: 3
+
+    ## type of statistical significant to be used for the call step; it can be either 'pVal' or 'FDR'
+    statistical_significance_diff: pVal
+    
+    ## value of statistical threshold for the call step
+    statistical_threshold_diff: 0.05
