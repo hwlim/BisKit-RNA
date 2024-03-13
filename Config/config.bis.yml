@@ -14,13 +14,6 @@ diff_pair_list:
 
 ## parameters
 params:
-    ## docker container
-    ## you can either set the container variable to "NULL" or path to the container file you downloaded manually.
-    ## If set to "NULL", snakemake will automatically download the container from docker and store it in the working directory.
-    ## If set to a path to the downloaded container, you can keep a single copy of the container and save disk space in the long run.
-    ## If set to a path to the downloaded container, you need to download the docker container manually and designate the path (in quotation marks) to the container in the 'container_path' variable.
-    ## To download the container manually, use 'singularity pull /your/path/biskit.sif docker://ahnsf9/biskit:1.0.4'. Check https://github.com/hwlim/bisKit for details.
-    container_path: "NULL"
 
     ## reference directory that contains reference FA files, index, bed etc.
     ref_dir: "/Genomes/mm10"

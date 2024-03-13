@@ -1,10 +1,9 @@
-# BisKit
+# BisKit_CCHMC
 
 *BisKit* is a snakemake pipeline that allows the user to analyze bisulfite sequencing data. It is created by Chris Ahn and Dr. Hee Woong Lim from the LimLab in the BMI division at CCHMC.
-
+*BisKit* is for use only on the CCHMC HPC.
 *BisKit* aligns reads sequentially to multiple RNA sources and outputs detailed alignment, read, and call statistics for each sample as well as pairwise comparison results between the input samples. The results are also summarized in the form of a MultiQC report.
 
-*BisKit* assumes the user is working on an high-performance computing cluster using the LSF workload manager.
 <br/>
 <br/>
 
@@ -42,25 +41,20 @@ BisKit aligns the reads to multiple sources in the following order:
 ### 1.1. Initial setup
 *The initial setup should be performed only once.*
 
-|Required dependencies|
-|------|
-|snakemake v7.30.0 or higher
-|Singularity v3.7.0 or higher
-
 Move to your home directory.
 ```bash
 cd ~
 ```
 
-Clone BisKit to your home directory. You can clone the repo to any location, but for the purposes of this README it will be cloned to your home directory. This will create a folder called BisKit with the files necessary to run BisKit on the CCHMC HPC. Change permissions to the newly downloaded files in case you might not have permission to access them.
+Clone BisKit_CCHMC to your home directory. You can clone the repo to any location, but for the purposes of this README it will be cloned to your home directory. This will create a folder called BisKit_CCHMC with the files necessary to run BisKit on the CCHMC HPC. Change permissions to the newly downloaded files in case you might not have permission to access them.
 ```bash
-git clone https://github.com/hwlim/bisKit.git
-chmod -R 755 ~/bisKit
+git clone https://github.com/hwlim/BisKit_CCHMC.git
+chmod -R 755 ~/BisKit_CCHMC
 ```
 
 Set PATH to the BisKit directory in **.bash_profile** to have access to it in any directory for ease of use in the future, and define a temporary directory as well for use by BisKit during analysis.
 ```bash
-echo 'export BISKIT_PATH=~/bisKit' >>~/.bash_profile
+echo 'export BISKIT_PATH=~/BisKit_CCHMC' >>~/.bash_profile
 echo 'export PATH=$PATH:${BISKIT}/Snakemake' >>~/.bash_profile
 echo 'export PATH=$PATH:${BISKIT}/Scripts' >>~/.bash_profile
 echo 'export TMPDIR=/scratch/$(whoami)' >>~/.bash_profile
@@ -89,7 +83,7 @@ mm10
 │   ├── index_HISAT2-3N
 │   ├── miRNA.fa
 │   ├── miRNA.fa.fai
-│   └── miRNA_mature.gtf
+│   └── miRNA.gtf
 ├── piRNA
 │   ├── index_HISAT2-3N
 │   ├── piRNA.fa
@@ -178,7 +172,6 @@ Note that the **Id** and **Name** are the same for each sample, and the **Group*
 
 |Parameter|Description|Default Value|
 |---------|-----------|-------------|
-|**container_path**|Path to container (covered in section 1.4 of this README).|"NULL"|
 |**refDir**|Path to the reference directory that contains reference files and HISAT2 index files (covered in section 1.2.1 of this README).|"/Genomes/mm10"|
 |**adapter**|adapter used for trimming. Set as "NULL" if you don't want to perform trimming. Check the config file for detailed adapter options.|["AGATCGGAAGAGC", "TGGAATTCTCGGGTGCCAAGG"]|
 |**opt_cutadapt**|Additional options used for cutadapt. Follow the cutadapt software flag syntax; leave empty quotes if N/A.|"--minimum-length 18 -q 20"|
@@ -196,30 +189,6 @@ Note that the **Id** and **Name** are the same for each sample, and the **Group*
 |**statistical_threshold_diff**|value of statistical threshold for the methylation call step|0.05|
 
 <br/>
-
-### 1.4 Docker Container Management
-The BisKit pipeline is managed by Snakemake, and Snakemake uses Singularity to download a Docker container (around 1.5 GB). This container is a separate environment used to run BisKit without installing any additional dependencies. Container management depends on the "container_path" parameter in the config.bis.yml file, further explained in the following section.
-
-#### 1.4.1 Setting the 'container_path' parameter in the config.bis.yml file to "NULL"
-If the 'container_path' parameter in the config.bis.yml file is set to "NULL", the container will automatically be downloaded and stored in the analysis folder to be used whenever the user runs BisKit in that same analysis folder. Note that Snakemake will create a copy of the container every time the user runs BisKit in a different analysis folder. Creating a copy of an existing container will not take long since the download files will be cached in your home directory at ~/.singularity/cache. You can delete the files here to free up some disk space, but keep in mind that container cache files will be downloaded into this directory every time you run BisKit in a new directory using this method. (Check section 1.4.2 if you want to avoid this)
-<br/>
-The working container will be stored in the following path, assuming your analysis folder is named "BisKit_Analysis".
-```bash
-BisKit_Analysis/.snakemake/singularity/
-```
-There is also a singularity cache folder in your home directory; make sure to clean them up regularly if you choose to have snakemake automatically handle the container.
-```bash
-~/.singularity/cache
-```
-If you would like to download the container again, delete the cache directory and the image in your analysis directory with the file extension ".simg" before running BisKit in the work directory again.
-
-#### 1.4.2 Setting the 'container_path' parameter in the config.bis.yml file to the location of the downloaded container
-You can avoid Snakemake creating a new copy of the container every time you run BisKit on a new dataset by setting the 'container_path' parameter in the config.bis.yml file to the location of the downloaded container. You instead need to download the container manually and keep the copy at your chosen location by running the command below. For the purposes of this tutorial, the container will be saved to the home directory and will be named 'biskit.sif':
-```bash
-module load singularity
-singularity pull ~/biskit.sif docker://ahnsf9/biskit:1.0.4
-```
-You then need to set the 'container_path' parameter in the config.bis.yml file to "~/biskit.sif" (with quotation marks). Snakemake can use this image instead of downloading the container every time you run BisKit in a new directory, which can save disk space in the long run.
 
 ## 2. Running BisKit
 
@@ -242,7 +211,7 @@ After running BisKit, check if the jobs are automatically created and submitted 
 ```bash
 bjobs
 ```
-There will be only one job during the first few seconds or even up to an hour especially on the first run depending on the network status of the cluster, since the job will need time to download the Docker containers used for the pipeline. The first jobs that appears in the jobs list is the master job that automatically creates and submits each task.<br>
+There will be only one job during the first few seconds or even up to a couple minuts depending on the network status of the cluster. The first jobs that appears in the jobs list is the master job that automatically creates and submits each task.<br>
 Child jobs will eventually appear and run as their dependencies are satisfied.<br>
 
 <br/>
