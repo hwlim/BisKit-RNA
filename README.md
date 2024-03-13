@@ -55,8 +55,8 @@ chmod -R 755 ~/BisKit_CCHMC
 Set PATH to the BisKit directory in **.bash_profile** to have access to it in any directory for ease of use in the future, and define a temporary directory as well for use by BisKit during analysis.
 ```bash
 echo 'export BISKIT_PATH=~/BisKit_CCHMC' >>~/.bash_profile
-echo 'export PATH=$PATH:${BISKIT_PATH}/Snakemake' >>~/.bash_profile
 echo 'export PATH=$PATH:${BISKIT_PATH}/Scripts' >>~/.bash_profile
+# if not declared
 echo 'export TMPDIR=/scratch/$(whoami)' >>~/.bash_profile
 source ~/.bash_profile
 ```
