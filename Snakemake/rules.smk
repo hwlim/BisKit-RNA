@@ -37,8 +37,9 @@ rule align_se_rRNA:
 		cluster["align_pe"]["cpu"]
 	shell:
 		"""
+		module purge
 		module load hisat2/2.2.1
-		module load samtools/1.14.0
+		module load samtools/1.18.0
 
 		hisat-3n --un-gz {output.unaligned} {soft_clip} --no-unal --summary-file {output.summary} \
 		-x {rRNA_index} \
@@ -79,7 +80,7 @@ rule post_process_bam_rRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load samtools/1.18.0
 		module load seqtk/1.3
 
@@ -114,7 +115,8 @@ rule run_samtools_mpileup_all_rRNA:
 		"Running samtools mpileup for rRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {rRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -137,7 +139,8 @@ rule run_samtools_mpileup_uniq_rRNA:
 		"Running samtools mpileup uniq for rRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {rRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -221,9 +224,9 @@ rule align_se_tRNA:
 		cluster["align_pe"]["cpu"]
 	shell:
 		"""
-		# module purge
+		module purge
 		module load hisat2/2.2.1
-		module load samtools/1.14.0
+		module load samtools/1.18.0
 		# module load anaconda3
 		# source activate BisKit
 
@@ -267,6 +270,7 @@ rule post_process_bam_tRNA:
 
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		module load seqtk/1.3
 
@@ -330,8 +334,8 @@ rule run_samtools_mpileup_all_tRNA:
 
 	shell:
 		"""
-
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {tRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -355,8 +359,8 @@ rule run_samtools_mpileup_uniq_tRNA:
 
 	shell:
 		"""
-
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {tRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -487,6 +491,7 @@ rule post_process_bam_miRNA:
 
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		module load seqtk/1.3
 
@@ -551,8 +556,8 @@ rule run_samtools_mpileup_all_miRNA:
 
 	shell:
 		"""
-
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {miRNA_hairpin_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -576,8 +581,8 @@ rule run_samtools_mpileup_uniq_miRNA:
 
 	shell:
 		"""
-
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {miRNA_hairpin_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -702,7 +707,7 @@ rule post_process_bam_piRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load samtools/1.18.0
 		module load seqtk/1.3
 
@@ -764,7 +769,8 @@ rule run_samtools_mpileup_all_piRNA:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 		samtools mpileup -B -f {piRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -787,7 +793,8 @@ rule run_samtools_mpileup_uniq_piRNA:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 		samtools mpileup -B -f {piRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -873,8 +880,9 @@ rule align_se_genome:
 		cluster["align_pe"]["cpu"]
 	shell:
 		"""
+		module purge
 		module load hisat2/2.2.1
-		module load samtools/1.14.0
+		module load samtools/1.18.0
 
 		hisat-3n --un-gz {output.unaligned} {soft_clip} --no-unal --summary-file {output.summary} \
 		-x {genome_index} \
@@ -912,8 +920,8 @@ rule post_process_bam_genome:
 
 	shell:
 		"""
-
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		## split to forward strand
 		echo "making align.plus.bam."
@@ -1000,7 +1008,8 @@ rule run_samtools_mpileup_all_genome:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 		samtools mpileup -B -f {genome_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -1024,7 +1033,8 @@ rule run_samtools_mpileup_uniq_genome:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 		samtools mpileup -B -f {genome_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -1113,8 +1123,9 @@ rule align_se_circRNA:
 		cluster["align_pe"]["cpu"]
 	shell:
 		"""
+		module purge
 		module load hisat2/2.2.1
-		module load samtools/1.14.0
+		module load samtools/1.18.0
 
 		hisat-3n --un-gz {output.unaligned} {soft_clip} --no-unal --summary-file {output.summary} \
 		-x {circRNA_index} \
@@ -1154,6 +1165,7 @@ rule post_process_bam_circRNA:
 
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		module load seqtk/1.3
 
@@ -1250,7 +1262,8 @@ rule run_samtools_mpileup_all_circRNA:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {circRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -1274,7 +1287,8 @@ rule run_samtools_mpileup_uniq_circRNA:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		samtools mpileup -B -f {circRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
@@ -1735,14 +1749,19 @@ rule compare_candidates:
 		candidates = lambda wildcards: get_comparison_candidate_tsv(wildcards.diffPairName)
 	output:
 		tsv = compare_dir + "/{diffPairName}/pairwise_comparison.tsv"
+	params:
+		groupList = lambda wildcards: get_group(wildcards.diffPairName)
 	message:
 		"Comparing candidates between two samples... [{wildcards.diffPairName}]"
 	shell:
 		"""
 		module load python3/3.6.3
-		rBis.compare_pairwise.py -c {input.candidates} -o {compare_dir}/{wildcards.diffPairName} -s {src_sampleInfo} -p {wildcards.diffPairName} -m {min_reps}
+		rBis.compare_pairwise.py -c {input.candidates} -o {compare_dir}/{wildcards.diffPairName} -s {src_sampleInfo} -p {wildcards.diffPairName} -g {params.groupList} -m {min_reps}
 		"""
 
+def get_group(diffPairName):
+	groupList = diffPairNameDict[diffPairName]
+	return ','.join(groupList)
 
 ## categorize by threshold
 rule categorize_comparisons:
@@ -1754,7 +1773,8 @@ rule categorize_comparisons:
 		plots = expand(compare_dir + "/{{diffPairName}}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/{pre}.png", pre=["methRate_log2foldChange", "methRate_log2foldChange_"+sig_type_diff, "delta_methRate", "delta_methRate_"+sig_type_diff])
 	params:
 		sig = sig_thresh_diff,
-		diff = diff_thresh
+		diff = diff_thresh,
+		groupList = lambda wildcards: get_group(wildcards.diffPairName)
 	message:
 		"Categorizing comparison between two samples... [{wildcards.diffPairName}]"
 	shell:
@@ -1767,7 +1787,8 @@ rule categorize_comparisons:
 		-s {sig_thresh_diff} -t {sig_type_diff} \
 		-d {params.diff} \
 		-i {src_sampleInfo} \
-		-n {wildcards.diffPairName}
+		-n {wildcards.diffPairName} \
+		-g {params.groupList}
 		"""
 
 
@@ -1960,7 +1981,8 @@ rule get_readLen_genome:
 
 	shell:
 		"""
-		module load samtools/1.14.0
+		module purge
+		module load samtools/1.18.0
 
 		## get most common read length
 		#samtools stats {input.bam} | grep ^RL | cut -f 2- | gawk 'BEGIN {{ max = 0; row = "" }} $2 > max {{ max = $2; row = $0 }} END {{ print row }}' | cut -f1 > {output.readLenGenome}

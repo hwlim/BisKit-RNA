@@ -25,7 +25,9 @@ options.add_argument('-m', '--minReps', default=2,
 options.add_argument('-i', '--sampleFile',
                         help='sample.tsv')
 options.add_argument('-n', '--comparisonPair',
-                        help='comparison pair')  
+                        help='comparison pair')
+options.add_argument('-g', '--groupList',
+                        help='group list')  
 
 args = options.parse_args()
 pairwise = args.pairwise
@@ -34,12 +36,11 @@ sigThresh = float(args.sig)
 diffThresh = float(args.diff)
 minReps = int(args.minReps)
 comparison = args.comparisonPair
+groupList = args.groupList.split(",")
 
 ## import group as dictionary from command line
 sampleFile = args.sampleFile
 sampleFile = pd.read_csv(sampleFile, sep="\t", comment="#", na_filter=False)
-
-groupList = comparison.split("_vs_")
 
 groups = {}
 for group in groupList:

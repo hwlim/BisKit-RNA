@@ -51,15 +51,15 @@ config_PW = "config.bis.yml"
 with open(os.path.expanduser(config_PW), 'r') as fh:
 	config_pw = yaml.safe_load(fh)
 
-# diffPairNameL = list(config_pw['diff_pair_list'].keys())
-
 try:
     diffPairNameL = list(config_pw['diff_pair_list'].keys())
+
 except AttributeError:
     # Code to handle the AttributeError
 	diffPairNameL = ""
 	print("Pipeline will not be performing pairwise comparisons; check the config.bis.yml file if this is not what you intend to do.")
 
+diffPairNameDict = config_pw["diff_pair_list"]
 
 ## parse parameters fron the config.bis.yml file
 ref_dir = config_pw['params']['ref_dir']

@@ -18,6 +18,8 @@ options.add_argument('-s', '--sampleFile',
                         help='sample.tsv')
 options.add_argument('-p', '--comparisonPair',
                         help='comparison pair')
+options.add_argument('-g', '--groupList',
+                        help='group list')
 options.add_argument('-m', '--minReps', default = 2,
                         help='minimum number of replicates a C location has to appear in to be considered a candidate; default = 1')
 args = options.parse_args()
@@ -26,12 +28,11 @@ sampleCandidates = args.candidates
 outFile = args.outFile
 comparison = args.comparisonPair
 minReps = args.minReps
+groupList = args.groupList.split(",")
 
 ## import group as dictionary from command line
 sampleFile = args.sampleFile
 sampleFile = pd.read_csv(sampleFile, sep="\t", comment="#", na_filter=False)
-
-groupList = comparison.split("_vs_")
 
 groups = {}
 for group in groupList:
