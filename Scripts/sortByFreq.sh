@@ -72,8 +72,8 @@ if [ $decrease -eq 1 ];then
 fi
 
 cat $src \
-	| sort \
+	| sort -S 1G \
 	| uniq -c \
 	| sed -e 's/^ *//' -e 's/ /\t/' \
-	| sort $opt 
+	| sort -S 1G $opt 
 

@@ -76,8 +76,8 @@ samtools index ${des}/align.plus.uniq.bam
 ## get discarded reads
 echo "getting discarded reads."
 ### get read names in forward and reverse bam
-samtools view ${des}/align.plus.bam | cut -f1 | sort | uniq > ${des}/plusReads.txt
-samtools view ${des}/align.minus.bam | cut -f1 | sort | uniq > ${des}/minusReads.txt
+samtools view ${des}/align.plus.bam | cut -f1 | sort -S 1G | uniq > ${des}/plusReads.txt
+samtools view ${des}/align.minus.bam | cut -f1 | sort -S 1G | uniq > ${des}/minusReads.txt
 
 ### get reads that are only found in align.minus.bam
 comm -13 ${des}/plusReads.txt ${des}/minusReads.txt > ${des}/discardedReadNames.txt
