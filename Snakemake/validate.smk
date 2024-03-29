@@ -62,8 +62,8 @@ if not samples.Name.is_unique:
 ## Must start with alphanumeric only
 invalid_elem=[]
 
-if samples.drop('Fq2', axis=1).applymap(lambda x: x == '' or pd.isna(x)).any().any() == True:
-    print( "Error: There should not be any empty values in the sample sheet" )
+if samples.applymap(lambda x: x == '' or pd.isna(x)).any().any():
+    print("Error: There should not be any empty values in the sample sheet")
     sys.exit(1)
 
 for col in samples:
