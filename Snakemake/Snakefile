@@ -100,6 +100,16 @@ if soft_clipping == True:
 	soft_clip = ''
 else:
 	soft_clip = '--no-softclip'
+Allow_genome_spliced_alignment = config_pw['params']['Allow_genome_spliced_alignment']
+if Allow_genome_spliced_alignment == True:
+	genome_splice = ''
+else:
+	genome_splice = '--no-spliced-alignment'
+Allow_RNA_spliced_alignment = config_pw['params']['Allow_RNA_spliced_alignment']
+if Allow_RNA_spliced_alignment == True:
+	RNA_splice = ''
+else:
+	RNA_splice = '--no-spliced-alignment'
 
 ## adapter trimming
 adapter = config_pw['params']['adapter']

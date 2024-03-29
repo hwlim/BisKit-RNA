@@ -52,7 +52,7 @@ git clone https://github.com/hwlim/BisKit_CCHMC.git
 chmod -R 755 ~/BisKit_CCHMC
 ```
 
-Set PATH to the BisKit directory in **.bash_profile** to have access to it in any directory for ease of use in the future, and define a temporary directory as well for use by BisKit during analysis.
+Set PATH to the BisKit directory in **.bash_profile** to have access to it in any directory for ease of use in the future, and define a temporary directory as well for use by BisKit during analysis. For this tutorial (working on the cluster at CCHMC), TMPDIR will be set as the user's scratch directory on the cluster.
 ```bash
 echo 'export BISKIT_PATH=~/BisKit_CCHMC' >>~/.bash_profile
 echo 'export PATH=$PATH:${BISKIT_PATH}/Scripts' >>~/.bash_profile
@@ -176,6 +176,8 @@ Note that the **Id** and **Name** are the same for each sample, and the **Group*
 |**adapter**|adapter used for trimming. Set as "NULL" if you don't want to perform trimming. Check the config file for detailed adapter options.|["AGATCGGAAGAGC", "TGGAATTCTCGGGTGCCAAGG"]|
 |**opt_cutadapt**|Additional options used for cutadapt. Follow the cutadapt software flag syntax; leave empty quotes if N/A.|"--minimum-length 18 -q 20"|
 |**softClipping**|Soft-clipping setting for alignment|True|
+|**Allow_genome_spliced_alignment**|Allow spliced alignment during genome alignment|True|
+|**Allow_RNA_spliced_alignment**|Allow spliced alignment during RNA alignment|False|
 |**doDedup**|Perform deduplication|False|
 |**chrRegexTarget**|Regular expressions for target chromosome names.|"^chr[0-9XY]+$"|
 |**coverage_threshold**|threshold for minimum coverage for a position to be considered a potential candidate|10|
@@ -383,8 +385,6 @@ The **1.Sample** directory contains output files pertaining to each sample.
 │   ├── featureCount_uniq.log
 │   ├── featureCount_uniq.txt
 │   ├── featureCount_uniq.txt.summary
-│   ├── mpileup_all.tsv
-│   ├── mpileup_final.tsv
 │   ├── mpileup_out_raw_all.tsv
 │   ├── mpileup_out_raw_uniq.tsv
 │   ├── mpileup_uniq.tsv
@@ -395,8 +395,6 @@ The **1.Sample** directory contains output files pertaining to each sample.
 │   ├── call_cov10
 │   ├── featureCount_all.txt
 │   ├── featureCount_uniq.txt
-│   ├── mpileup_all.tsv
-│   ├── mpileup_final.tsv
 │   ├── mpileup_out_raw_all.tsv
 │   ├── mpileup_out_raw_uniq.tsv
 │   ├── mpileup_uniq.tsv

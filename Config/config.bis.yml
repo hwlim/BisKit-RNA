@@ -33,6 +33,12 @@ params:
     ## softclipping during alignment; enter 'True' to allow soft-clipping or 'False' to prevent soft-clipping, without the quotation marks
     soft_clipping: True
 
+    ## Set genome spliced alignment
+    Allow_genome_spliced_alignment: True
+
+    ## Set RNA spliced alignment
+    Allow_RNA_spliced_alignment: False
+
     ## deduplication
     doDedup: False
 
