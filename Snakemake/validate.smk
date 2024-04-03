@@ -58,14 +58,14 @@ if not samples.Name.is_unique:
 	print( "Error: Name column in sample.tsv is not unique" )
 	sys.exit(1)
 
-## Group column must not overlap with Name column
-#if not len(set(samples.Group).intersection(set(samples.Name)))==0:
-#	print( "Error: Sample Group name must not overlap with Name" )
-#	sys.exit(1)
-
 ## Only alphanumeric / dash / underbar / dot in sample sheet
 ## Must start with alphanumeric only
 invalid_elem=[]
+
+if samples.applymap(lambda x: x == '' or pd.isna(x)).any().any():
+    print("Error: There should not be any empty values in the sample sheet")
+    sys.exit(1)
+
 for col in samples:
     tmp = samples[col].str.count(r'(^[a-zA-Z0-9][a-zA-Z0-9-_\.]+$)')
     index_invalid = (tmp == 0)
@@ -73,7 +73,7 @@ for col in samples:
         invalid_elem = invalid_elem + samples[col][index_invalid].tolist()
 
 if len(invalid_elem) > 0:
-    print( "Error: Must be at least two character; Only alphanumeric, dash (-) and underbar (_) are allowed in a sample sheet")
+    print( "Error: Must be at least two characters; Only alphanumeric, dash (-) and underbar (_) are allowed in a sample sheet")
     print( "Invalid values:" )
     for elem in invalid_elem: print( "  - %s" % elem )
     sys.exit(1)
