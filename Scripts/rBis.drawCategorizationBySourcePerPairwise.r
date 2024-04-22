@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library('data.table', quiet=TRUE))
 
 # command line option handling
 option_list <- list(
-	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=allReadsStratification")
+	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=m5cSignificant")
 )
 parser <- OptionParser(usage = "%prog [options] <tsv>", option_list=option_list,
 			description = "Draw bar plot of proportion of significant m5C candidates per Source.")

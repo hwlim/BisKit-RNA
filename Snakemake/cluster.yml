@@ -49,12 +49,12 @@ call_m5C_candidates_rRNA:
 
 call_m5C_candidates_genome:
     cpu         : 2
-    memory      : 60000
+    memory      : 16000
     walltime    : "4:00"
 
 call_m5C_candidates_circRNA:
     cpu         : 2
-    memory      : 20000
+    memory      : 16000
     walltime    : "4:00"
 
 compare_candidates:
@@ -155,7 +155,7 @@ draw_categorizations_per_pairwise_as_volcano:
 
 draw_candidate_profile:
     cpu         : 4
-    memory      : 40000
+    memory      : 8000
     walltime    : "4:00"
 
 separate_and_merge_categorizations_by_source:

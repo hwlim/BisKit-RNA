@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+set -o pipefail
 
 function printUsage {
 	echo -e "Usage: `basename $0` -o <destination directory> <original bam file> <plus bam file> <minus bam file> <sample name>
@@ -52,35 +53,28 @@ unalignedFQ=$5
 ###################################
 ## main code
 
-# totalReads=$(samtools view $bam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | wc -l)
-# totalUniq=$(samtools view $bam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -w "1" | wc -l)
-# totalMulti=$(samtools view $bam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -vw "1" | wc -l)
+## count all reads
 bamSortedByFreq=${TMPDIR}/bam_sorted_$$_$RANDOM
 samtools view $bam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $bamSortedByFreq
 totalReads=$(wc -l $bamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
 totalUniq=$(cut -f1 $bamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
 totalMulti=$(cut -f1 $bamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
 
-
-# totalPlusReads=$(samtools view $plusBam | cut -f1 | sort -S 1G | uniq | wc -l)
-# plusUniq=$(samtools view $plusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -w "1" | wc -l)
-# plusMulti=$(samtools view $plusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -vw "1" | wc -l)
+## count plus reads
 plusBamSortedByFreq=${TMPDIR}/plusBam_sorted_$$_$RANDOM
 samtools view $plusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $plusBamSortedByFreq
 totalPlusReads=$(wc -l $plusBamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
 plusUniq=$(cut -f1 $plusBamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
 plusMulti=$(cut -f1 $plusBamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
 
-
-# totalMinusReads=$(samtools view $minusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | wc -l)
-# minusUniq=$(samtools view $minusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -w "1" | wc -l)
-# minusMulti=$(samtools view $minusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh | cut -f1 | grep -vw "1" | wc -l)
+## count minus reads
 minusBamSortedByFreq=${TMPDIR}/minusBam_sorted_$$_$RANDOM
 samtools view $minusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $minusBamSortedByFreq
 totalMinusReads=$(wc -l $minusBamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
 minusUniq=$(cut -f1 $minusBamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
 minusMulti=$(cut -f1 $minusBamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
 
+## count unaligned
 unaligned=$( zcat $unalignedFQ | wc -l) || { echo "Error"; exit 1; }
 
 echo totalReads: $totalReads
