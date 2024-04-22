@@ -5,8 +5,8 @@
 #
 __default__:
     cpu         : 2
-    memory      : 10000
-    walltime    : "6:00"
+    memory      : 8000
+    walltime    : "4:00"
     name        : "{rule}.{wildcards.sampleName}"
     output      : "logs/{rule}.{wildcards.sampleName}.out"
     error       : "logs/{rule}.{wildcards.sampleName}.err"
@@ -17,68 +17,63 @@ trim_pe:
     output      : "logs/{rule}.{wildcards.sampleId}.out"
     error       : "logs/{rule}.{wildcards.sampleId}.err"
 
-align_pe:
-    cpu         : 4
-    memory      : 50000
-    walltime    : "8:00"
-
-align_se_genome_star:
-    cpu         : 4
-    memory      : 50000
-    walltime    : "8:00"
-
-get_read_stats_tRNA:
-    cpu         : 4
-    memory      : 20000
-    walltime    : "24:00"
-
-get_read_stats_rRNA:
-    cpu         : 4
-    memory      : 50000
-    walltime    : "24:00"
-
-run_samtools_mpileup_rRNA:
-    cpu         : 4
-    memory      : 50000
-    walltime    : "24:00"
-
-run_samtools_mpileup_genome:
+align_se:
     cpu         : 4
     memory      : 40000
-    walltime    : "24:00"
+    walltime    : "6:00"
+
+get_read_stats_tRNA:
+    cpu         : 2
+    memory      : 4000
+    walltime    : "4:00"
+
+get_read_stats_rRNA:
+    cpu         : 2
+    memory      : 4000
+    walltime    : "4:00"
+
+run_samtools_mpileup_rRNA:
+    cpu         : 2
+    memory      : 16000
+    walltime    : "4:00"
+
+run_samtools_mpileup_genome:
+    cpu         : 2
+    memory      : 16000
+    walltime    : "4:00"
 
 call_m5C_candidates_rRNA:
-    cpu         : 4
-    memory      : 20000
-    walltime    : "24:00"
+    cpu         : 2
+    memory      : 16000
+    walltime    : "4:00"
 
 call_m5C_candidates_genome:
-    cpu         : 4
+    cpu         : 2
     memory      : 60000
-    walltime    : "24:00"
+    walltime    : "4:00"
 
 call_m5C_candidates_circRNA:
-    cpu         : 4
+    cpu         : 2
     memory      : 20000
-    walltime    : "48:00"
+    walltime    : "4:00"
 
 compare_candidates:
-    cpu         : 4
-    memory      : 20000
+    cpu         : 2
+    memory      : 8000
     name        : "{rule}.{wildcards.diffPairName}"
     output      : "logs/{rule}.{wildcards.diffPairName}.out"
     error       : "logs/{rule}.{wildcards.diffPairName}.err"
 
 categorize_comparisons:
-    cpu         : 4
-    memory      : 20000
+    cpu         : 2
+    memory      : 8000
     name        : "{rule}.{wildcards.diffPairName}"
     output      : "logs/{rule}.{wildcards.diffPairName}.out"
     error       : "logs/{rule}.{wildcards.diffPairName}.err"
 
 draw_categorizations_by_source_per_pairwise:
     cpu         : 2
-    memory      : 20000
+    memory      : 8000
     name        : "{rule}.{wildcards.diffPairName}"
     output      : "logs/{rule}.{wildcards.diffPairName}.out"
     error       : "logs/{rule}.{wildcards.diffPairName}.err"
@@ -140,7 +135,7 @@ draw_categorizations_by_source_per_pairwise:
 
 align_se_genome:
     cpu         : 4
-    memory      : 80000
+    memory      : 40000
     walltime    : "6:00"
 
 align_se_rRNA:
@@ -161,7 +156,7 @@ draw_categorizations_per_pairwise_as_volcano:
 draw_candidate_profile:
     cpu         : 4
     memory      : 40000
-    walltime    : "8:00"
+    walltime    : "4:00"
 
 separate_and_merge_categorizations_by_source:
     name        : "{rule}"

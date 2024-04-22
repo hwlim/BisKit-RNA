@@ -154,7 +154,7 @@ rule all:
 		## rRNA output
 		trimming,
 		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
-		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
 		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
 		expand(sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/alignStats.tsv", sampleName=sample_list),
@@ -168,7 +168,7 @@ rule all:
 
 		## tRNA output
 		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
-		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
@@ -184,7 +184,7 @@ rule all:
 
 		## miRNA output
 		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
-		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
@@ -200,7 +200,7 @@ rule all:
 
 		## piRNA output
 		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
-		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
@@ -221,9 +221,7 @@ rule all:
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/m-bias_mostCommonReadLengthOfGenomeAlignment_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/alignStats.tsv", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/unaligned.fq.gz", sampleName=sample_list),
-		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam", sampleName=sample_list),
-		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam", sampleName=sample_list),
-		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam", sampleName=sample_list),
+		expand(sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["uniq", "plus", "minus"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_all.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_uniq.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + genome_dir + "/readStats.tsv", sampleName=sample_list),
@@ -235,7 +233,7 @@ rule all:
 
 		## circRNA output
 		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.{ext}", sampleName=sample_list, ext=["bam", "bam.bai"]),
-		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.{sub}.bam", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"]),
+		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.{sub}.{ext}", sampleName=sample_list, sub=["plus", "minus", "plus.uniq"], ext=["bam", "bam.bai"]),
 		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_all.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list),
 		expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/m-bias_mostCommonReadLength_{direction}.png", sampleName=sample_list, direction = ["forward", "reverse"]),

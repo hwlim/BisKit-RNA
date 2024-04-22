@@ -18,8 +18,6 @@ if(length(arguments$args) == 0) {
 	src=arguments$args
 }
 
-# print(srcL)
-
 # Option handling
 opt=arguments$options
 outPrefix=opt$outPrefix
@@ -39,41 +37,41 @@ samp1 = strsplit(compName, "_vs_")[[1]][1]
 samp2 = strsplit(compName, "_vs_")[[1]][2]
 
 ## select row based on column values
-uprRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "rRNA",])
-downrRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "rRNA",])
-unchangedrRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "rRNA",])
-uniq1rRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "rRNA",])
-uniq2rRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "rRNA",])
+uprRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "rRNA"))
+downrRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "rRNA"))
+unchangedrRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "rRNA"))
+uniq1rRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "rRNA"))
+uniq2rRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "rRNA"))
 
-uptRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "tRNA",])
-downtRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "tRNA",])
-unchangedtRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "tRNA",])
-uniq1tRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "tRNA",])
-uniq2tRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "tRNA",])
+uptRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "tRNA"))
+downtRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "tRNA"))
+unchangedtRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "tRNA"))
+uniq1tRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "tRNA"))
+uniq2tRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "tRNA"))
 
-upmiRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "miRNA",])
-downmiRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "miRNA",])
-unchangedmiRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "miRNA",])
-uniq1miRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "miRNA",])
-uniq2miRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "miRNA",])
+upmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "miRNA"))
+downmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "miRNA"))
+unchangedmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "miRNA"))
+uniq1miRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "miRNA"))
+uniq2miRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "miRNA"))
 
-uppiRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "piRNA",])
-downpiRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "piRNA",])
-unchangedpiRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "piRNA",])
-uniq1piRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "piRNA",])
-uniq2piRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "piRNA",])
+uppiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "piRNA"))
+downpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "piRNA"))
+unchangedpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "piRNA"))
+uniq1piRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "piRNA"))
+uniq2piRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "piRNA"))
 
-upGenome = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "Genome",])
-downGenome = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "Genome",])
-unchangedGenome = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "Genome",])
-uniq1Genome = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "Genome",])
-uniq2Genome = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "Genome",])
+upGenome = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "Genome"))
+downGenome = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "Genome"))
+unchangedGenome = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "Genome"))
+uniq1Genome = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "Genome"))
+uniq2Genome = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "Genome"))
 
-upcircRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "circRNA",])
-downcircRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "circRNA",])
-unchangedcircRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "circRNA",])
-uniq1circRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "circRNA",])
-uniq2circRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "circRNA",])
+upcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "circRNA"))
+downcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "circRNA"))
+unchangedcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "circRNA"))
+uniq1circRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "circRNA"))
+uniq2circRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "circRNA"))
 
 sumUp = uprRNA + uptRNA + upmiRNA + uppiRNA + upGenome + upcircRNA
 sumDown = downrRNA + downtRNA + downmiRNA + downpiRNA + downGenome + downcircRNA
