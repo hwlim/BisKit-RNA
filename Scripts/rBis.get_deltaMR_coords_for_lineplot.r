@@ -7,8 +7,7 @@ suppressPackageStartupMessages(library('tidyr', quiet=TRUE))
 
 # command line option handling
 option_list <- list(
-	make_option(c("-o","--outPrefix"), default="delta_MR_all_pairwise", help="Output prefix. default=delta_MR_all_pairwise"),
-    make_option(c("-d","--diffThresh"), default=0.05, help="Delta methylation rate threshold; default = 0.05")
+	make_option(c("-o","--outPrefix"), default="delta_MR_all_pairwise", help="Output prefix. default=delta_MR_all_pairwise")
 )
 parser <- OptionParser(usage = "%prog [options] <tsv>", option_list=option_list,
 			description = "Get coords for delta methRate distribution. This will be used to draw a lineplot in MultiQC.")
@@ -32,7 +31,7 @@ for( src in srcL ){
 	statsTable <- read.table(file = src, sep = '\t', header = TRUE, comment.char="")
 
     y_cols = grep("delta_MethRate_", names(statsTable))
-    comparison = strsplit(colnames(statsTable)[y_cols], "delta_MethRate_")[[1]][2]
+    comparison = strsplit(src, "/")[[1]][2]
     deltaMRpos <- subset(statsTable[, y_cols], statsTable[, y_cols] > 0.05 )
     deltaMRneg <- subset(statsTable[, y_cols], statsTable[, y_cols] < -0.05 )
     delta = c(deltaMRpos, deltaMRneg)

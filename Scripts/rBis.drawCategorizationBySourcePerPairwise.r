@@ -6,10 +6,18 @@ suppressPackageStartupMessages(library('data.table', quiet=TRUE))
 
 # command line option handling
 option_list <- list(
-	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=m5cSignificant")
+	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=m5cSignificant"),
+	make_option(c("-g","--groupList"), help="a string of groups separated by comma")
 )
 parser <- OptionParser(usage = "%prog [options] <tsv>", option_list=option_list,
-			description = "Draw bar plot of proportion of significant m5C candidates per Source.")
+			description = "Draw bar plot of proportion of significant m5C candidates per Source and output table.
+			Input:
+				- categorized_pairwise_comparison.tsv
+				- list of groups involved
+			Output:
+				- static plots for read categorization
+				- table containing read categorization
+			")
 arguments <- parse_args(parser, positional_arguments = TRUE)
 if(length(arguments$args) == 0) {
 	print_help(parser)
@@ -21,6 +29,8 @@ if(length(arguments$args) == 0) {
 # Option handling
 opt=arguments$options
 outPrefix=opt$outPrefix
+samp1=strsplit( opt$groupList, "," )[[1]][1]
+samp2=strsplit( opt$groupList, "," )[[1]][2]
 
 ## x-axis
 sources = c()
@@ -32,9 +42,8 @@ trend = c()
 counts = c()
 
 statsTable <- read.table(file = src, sep = '\t', header = TRUE, comment.char = "")
-compName = tail(strsplit(src, "/")[[1]], n=3)[1]
-samp1 = strsplit(compName, "_vs_")[[1]][1]
-samp2 = strsplit(compName, "_vs_")[[1]][2]
+# compName = tail(strsplit(src, "/")[[1]], n=3)[1]
+compName = paste0(samp1, "_vs_", samp2)
 
 ## select row based on column values
 uprRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "rRNA"))
@@ -94,34 +103,34 @@ testDF$Trend <- factor(testDF$Trend, levels=c('Up', 'Down'))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
 
-bars <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "stack", stat = "identity") +
-	scale_fill_manual(values=c("Red","Blue")) +
-	ggtitle("m5C Categorization Between Comparisons") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Counts")
+# bars <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "stack", stat = "identity") +
+# 	scale_fill_manual(values=c("Red","Blue")) +
+# 	ggtitle("m5C Categorization Between Comparisons") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Counts")
 
-ggsave(paste0(outPrefix, "_Count_(UPvDOWN).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Count_(UPvDOWN).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Count_(UPvDOWN).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Count_(UPvDOWN).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-barsProportion <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "fill", stat = "identity") +
-	scale_fill_manual(values=c("Red","Blue")) +
-	scale_y_continuous(labels = scales::percent_format()) +
-	ggtitle("m5C Categorization Between Comparisons (%)") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Proportion")
+# barsProportion <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "fill", stat = "identity") +
+# 	scale_fill_manual(values=c("Red","Blue")) +
+# 	scale_y_continuous(labels = scales::percent_format()) +
+# 	ggtitle("m5C Categorization Between Comparisons (%)") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Proportion")
 
-ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 
 ## UNIQ1 and UNIQ2
@@ -148,34 +157,34 @@ colnames(testDF) <- c('Source','Trend','Counts')
 testDF$Trend <- factor(testDF$Trend, levels=c(paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-bars <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "stack", stat = "identity") +
-	scale_fill_manual(values=c("Green","Yellow")) +
-	ggtitle("m5C Categorization Between Comparisons") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Counts")
+# bars <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "stack", stat = "identity") +
+# 	scale_fill_manual(values=c("Green","Yellow")) +
+# 	ggtitle("m5C Categorization Between Comparisons") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Counts")
 
-ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-barsProportion <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "fill", stat = "identity") +
-	scale_fill_manual(values=c("Green","Yellow")) +
-	scale_y_continuous(labels = scales::percent_format()) +
-	ggtitle("m5C Categorization Between Comparisons (%)") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Proportion")
+# barsProportion <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "fill", stat = "identity") +
+# 	scale_fill_manual(values=c("Green","Yellow")) +
+# 	scale_y_continuous(labels = scales::percent_format()) +
+# 	ggtitle("m5C Categorization Between Comparisons (%)") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Proportion")
 
-ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 ## All
 ## x-axis
@@ -208,34 +217,34 @@ colnames(testDF) <- c('Source','Trend','Counts')
 testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-bars <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "stack", stat = "identity") +
-	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-	ggtitle("m5C Categorization Between Comparisons") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Counts")
+# bars <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "stack", stat = "identity") +
+# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+# 	ggtitle("m5C Categorization Between Comparisons") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Counts")
 
-ggsave(paste0(outPrefix, "_Count_(All).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Count_(All).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Count_(All).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Count_(All).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-barsProportion <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "fill", stat = "identity") +
-	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-	scale_y_continuous(labels = scales::percent_format()) +
-	ggtitle("m5C Categorization Between Comparisons (%)") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Source") +
-	ylab("Proportion")
+# barsProportion <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "fill", stat = "identity") +
+# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+# 	scale_y_continuous(labels = scales::percent_format()) +
+# 	ggtitle("m5C Categorization Between Comparisons (%)") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Source") +
+# 	ylab("Proportion")
 
-ggsave(paste0(outPrefix, "_Percentage_(All).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Percentage_(All).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Percentage_(All).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Percentage_(All).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 
 ## All Sources in one bar
@@ -262,31 +271,31 @@ colnames(testDF) <- c('Source','Trend','Counts')
 testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-bars <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "stack", stat = "identity") +
-	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-	ggtitle("m5C Categorization Between Comparisons") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Comparison") +
-	ylab("Counts")
+# bars <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "stack", stat = "identity") +
+# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+# 	ggtitle("m5C Categorization Between Comparisons") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Comparison") +
+# 	ylab("Counts")
 
-ggsave(paste0(outPrefix, "_Count_(Single).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Count_(Single).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Count_(Single).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Count_(Single).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-barsProportion <- ggplot(testDF,
-               aes(x = Source,
-                   y = Counts,
-                   fill = Trend)) +
-    geom_bar(position = "fill", stat = "identity") +
-	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-	scale_y_continuous(labels = scales::percent_format()) +
-	ggtitle("m5C Categorization Between Comparisons (%)") +
-	theme(plot.title = element_text(hjust = 0.5)) +
-	xlab("Comparison") +
-	ylab("Proportion")
+# barsProportion <- ggplot(testDF,
+#                aes(x = Source,
+#                    y = Counts,
+#                    fill = Trend)) +
+#     geom_bar(position = "fill", stat = "identity") +
+# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+# 	scale_y_continuous(labels = scales::percent_format()) +
+# 	ggtitle("m5C Categorization Between Comparisons (%)") +
+# 	theme(plot.title = element_text(hjust = 0.5)) +
+# 	xlab("Comparison") +
+# 	ylab("Proportion")
 
-ggsave(paste0(outPrefix, "_Percentage_(Single).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-ggsave(paste0(outPrefix, "_Percentage_(Single).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+# ggsave(paste0(outPrefix, "_Percentage_(Single).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+# ggsave(paste0(outPrefix, "_Percentage_(Single).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")

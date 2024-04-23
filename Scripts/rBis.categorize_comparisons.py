@@ -136,10 +136,18 @@ def differential(row):
         print()
         exit()
 
-
+## Function to move a column to a specific position
+def move_column_inplace(df, col, pos):
+    if col in df.columns:
+        ## Extract the column and delete it from original position
+        col_data = df.pop(col)
+        ## Reinsert it at the desired position
+        df.insert(pos, col, col_data)
+    else:
+        print(f"Column {col} not found in DataFrame.")
 
 ## get sampleNames
-sampleNames = pairwise.split("/")[-2].split("_vs_")
+sampleNames = groupList
 
 ## get comparison
 compareSamp = sampleNames[0] + "_vs_" + sampleNames[1]
@@ -188,47 +196,36 @@ masterDF.to_csv(outFile + "/categorized_pairwise_comparison.tsv", index=False, s
 
 ## get stats
 unique, counts = np.unique(masterDF[compareSamp], return_counts=True)
-
 unique = list(unique)
 counts = list(counts)
-cols = ['DOWN', 'NA', 'UP', f'Unique to {sampleNames[0]}', f'Unique to {sampleNames[1]}']
-
-for col in cols:
-    if col not in unique:
-        unique.append(col)
-        counts.append(0)
-
-print(unique)
-print(counts)
-
-## re-order
-# Change "test" to "more" in the list
-unique = ["uniq1" if item == f'Unique to {sampleNames[0]}' else item for item in unique]
-unique = ["uniq2" if item == f'Unique to {sampleNames[1]}' else item for item in unique]
-
-## add comparison header
-unique = ['Comparison'] + unique
 
 ## add comparison identifier
-counts = [compareSamp] + counts
+unique = ['Comparison'] + unique
+counts = [comparison] + counts
 
+## remove NA if there are replicates; they won't be needed for plotting
 if reps:
-    unique = unique[:2] + unique[3:]
-    counts = counts[:2] + counts[3:]
+    # Find the index of 'NA' in list1
+    if 'NA' in unique:
+        index = unique.index('NA')
+    
+        # Remove the item 'NA' from list1 and the corresponding item from list2
+        unique.pop(index)
+        counts.pop(index)
 
-print(unique)
-print(counts)
-
+## make dataframe and name columns by unique list
 df2 = pd.DataFrame(counts).T
+df2.columns = unique
+df2.rename(columns={f'Unique to {sampleNames[0]}': 'uniq1'}, inplace=True)
+df2.rename(columns={f'Unique to {sampleNames[1]}': 'uniq2'}, inplace=True)
 
-print(df2)
-
-if reps == False:
-    df2.columns = ['Comparison', 'DOWN', 'UNCHANGED', 'UP', 'uniq1', 'uniq2', 'NA']
-    df2 = df2[['Comparison', 'UP', 'DOWN', 'UNCHANGED', 'uniq1', 'uniq2', 'NA']]
-else:
-    df2.columns = ['Comparison', 'DOWN', 'UNCHANGED', 'UP', 'uniq1', 'uniq2']
-    df2 = df2[['Comparison', 'UP', 'DOWN', 'UNCHANGED', 'uniq1', 'uniq2']]
+## organize columns
+df2.columns = ['Comparison'] + df2.columns[1:].tolist()
+move_column_inplace(df2, 'UP', 1)
+move_column_inplace(df2, 'DOWN', 2)
+move_column_inplace(df2, 'UNCHANGED', 3)
+move_column_inplace(df2, 'uniq1', 4)
+move_column_inplace(df2, 'uniq2', 5)
 
 ## save stats
 df2.to_csv(outFile + "/stats.tsv", index=False, sep = "\t", header=True)

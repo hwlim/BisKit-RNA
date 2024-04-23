@@ -7,6 +7,7 @@ from pathlib import Path
 import scipy.stats as stats
 import statistics
 import math
+import ast
 pd.set_option('display.max_columns', None)
 
 options = argparse.ArgumentParser(description="Merge all pairwise comparison results.", usage="python3 rBis.merge_all_pairwise.py -p pairwise1.tsv pairwise2.tsv ...")
@@ -14,11 +15,16 @@ options.add_argument('-p','--pairwises', nargs='+',
                         help='Required; comma separated list of alignStat.txt files for all samples.', required=True)     
 options.add_argument('-o', '--outFile', default='~',
                         help='Path to output compare.tsv file')
+options.add_argument('-d', '--diffPairNameDict',
+                        help='dictionary for diffPairNames')
 args = options.parse_args()
 
 args = options.parse_args()
 pairwises = args.pairwises
 outFile = args.outFile
+diffPairNameDict = ast.literal_eval(args.diffPairNameDict)
+
+print(diffPairNameDict)
 
 dfList = []
 comparisons = []
@@ -26,7 +32,9 @@ comparisons = []
 ## modify format of sample files to merge them easily
 for i in range(len(pairwises)):
     dfTmp = pd.read_csv(pairwises[i], sep = '\t')
-    comparisonName = pairwises[i].split("/")[-3]
+    pairName = pairwises[i].split("/")[1]
+    tmpName = diffPairNameDict[pairName]
+    comparisonName="_vs_".join(tmpName)
     
     cols = ['#SeqID', 'refPos', 'refStrand', 'refBase', 'seqContext', 'genomicCoords', 'Source', 'gene_type', 'gene']
     dfTmp['SeqID'] = dfTmp[cols].apply(lambda row: ';'.join(row.values.astype(str)), axis=1)
@@ -71,5 +79,13 @@ for comp in comparisons:
 sampleNames = [*set(sampleNames)]
 sampleNames.sort()
 
+## rename cols
+for comp in comparisons:
+    groups = comp.split("_vs_")
+    key_found = next((key for key, value in diffPairNameDict.items() if value == groups), None)
+
+    masterDF.rename(columns={comp : key_found}, inplace=True)
+
+## save
 masterDF.to_excel(outFile + "/all_sample_comparisons.xlsx", index=False, header=True)
 masterDF.to_csv(outFile + "/all_sample_comparisons.tsv", index=False, sep="\t", header=True)
