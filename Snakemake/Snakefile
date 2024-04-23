@@ -294,12 +294,12 @@ rule all:
 		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/{pre}.png", diffPairName=diffPairNameL, pre=["methRate_log2foldChange", "methRate_log2foldChange_"+sig_type_diff,"delta_methRate", "delta_methRate_"+sig_type_diff]),
 		
 		## Draw categorization by source for each pairwise comparison
-		# expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source_{ext}_{cat}", diffPairName=diffPairNameL,  ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf", "(Single).png", "(Single).pdf"]),
+		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source_{ext}_{cat}", diffPairName=diffPairNameL,  ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf", "(Single).png", "(Single).pdf"]),
 		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source.tsv", diffPairName=diffPairNameL),
-		# expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Categorization_By_Source_For_All_Pairwise_Comparisons.tsv", diffPairName=diffPairNameL),
+		expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Categorization_By_Source_For_All_Pairwise_Comparisons.tsv", diffPairName=diffPairNameL),
 
 		## Draw general categorization between all pairwise
-		# expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Differential_Analysis_Categorization_{ext}_{cat}", ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf"]),
+		expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Differential_Analysis_Categorization_{ext}_{cat}", ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf"]),
 		mqc_dir + "/Differential_Analysis_Categorization.tsv",
 		expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/volcano{ext}", diffPairName=diffPairNameL, ext=[".png", ".pdf"]),
 		mqc_dir + "/Volcano_Plots.png",

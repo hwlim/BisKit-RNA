@@ -49,38 +49,38 @@ compName = paste0(samp1, "_vs_", samp2)
 uprRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "rRNA"))
 downrRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "rRNA"))
 unchangedrRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "rRNA"))
-uniq1rRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "rRNA"))
-uniq2rRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "rRNA"))
+uniq1rRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "rRNA"))
+uniq2rRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "rRNA"))
 
 uptRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "tRNA"))
 downtRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "tRNA"))
 unchangedtRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "tRNA"))
-uniq1tRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "tRNA"))
-uniq2tRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "tRNA"))
+uniq1tRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "tRNA"))
+uniq2tRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "tRNA"))
 
 upmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "miRNA"))
 downmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "miRNA"))
 unchangedmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "miRNA"))
-uniq1miRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "miRNA"))
-uniq2miRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "miRNA"))
+uniq1miRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "miRNA"))
+uniq2miRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "miRNA"))
 
 uppiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "piRNA"))
 downpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "piRNA"))
 unchangedpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "piRNA"))
-uniq1piRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "piRNA"))
-uniq2piRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "piRNA"))
+uniq1piRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "piRNA"))
+uniq2piRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "piRNA"))
 
 upGenome = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "Genome"))
 downGenome = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "Genome"))
 unchangedGenome = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "Genome"))
-uniq1Genome = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "Genome"))
-uniq2Genome = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "Genome"))
+uniq1Genome = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "Genome"))
+uniq2Genome = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "Genome"))
 
 upcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "circRNA"))
 downcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "circRNA"))
 unchangedcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "circRNA"))
-uniq1circRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp1) & Source == "circRNA"))
-uniq2circRNA = nrow(subset(statsTable, statsTable[[compName]] == paste0('Unique to ', samp2) & Source == "circRNA"))
+uniq1circRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "circRNA"))
+uniq2circRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "circRNA"))
 
 sumUp = uprRNA + uptRNA + upmiRNA + uppiRNA + upGenome + upcircRNA
 sumDown = downrRNA + downtRNA + downmiRNA + downpiRNA + downGenome + downcircRNA
@@ -103,34 +103,34 @@ testDF$Trend <- factor(testDF$Trend, levels=c('Up', 'Down'))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
 
-# bars <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "stack", stat = "identity") +
-# 	scale_fill_manual(values=c("Red","Blue")) +
-# 	ggtitle("m5C Categorization Between Comparisons") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Counts")
+bars <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "stack", stat = "identity") +
+	scale_fill_manual(values=c("Red","Blue")) +
+	ggtitle("m5C Categorization Between Comparisons") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Counts")
 
-# ggsave(paste0(outPrefix, "_Count_(UPvDOWN).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Count_(UPvDOWN).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Count_(UPvDOWN).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Count_(UPvDOWN).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-# barsProportion <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "fill", stat = "identity") +
-# 	scale_fill_manual(values=c("Red","Blue")) +
-# 	scale_y_continuous(labels = scales::percent_format()) +
-# 	ggtitle("m5C Categorization Between Comparisons (%)") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Proportion")
+barsProportion <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "fill", stat = "identity") +
+	scale_fill_manual(values=c("Red","Blue")) +
+	scale_y_continuous(labels = scales::percent_format()) +
+	ggtitle("m5C Categorization Between Comparisons (%)") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Proportion")
 
-# ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Percentage_(UPvDOWN).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 
 ## UNIQ1 and UNIQ2
@@ -144,7 +144,7 @@ trend = c()
 counts = c()
 
 sources = append(sources, c("rRNA", "rRNA", "tRNA", "tRNA", "miRNA", "miRNA", "piRNA", "piRNA", "Genome", "Genome", "circRNA", "circRNA"))
-trend = append(trend, c(paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+trend = append(trend, c("uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2"))
 counts = append(counts, c(uniq1rRNA, uniq2rRNA, uniq1tRNA, uniq2tRNA, uniq1miRNA, uniq2miRNA, uniq1piRNA, uniq2piRNA, uniq1Genome, uniq2Genome, uniq1circRNA, uniq2circRNA))
 
 tmpList <- list(sources, trend, counts)
@@ -154,37 +154,37 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c(paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-# bars <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "stack", stat = "identity") +
-# 	scale_fill_manual(values=c("Green","Yellow")) +
-# 	ggtitle("m5C Categorization Between Comparisons") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Counts")
+bars <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "stack", stat = "identity") +
+	scale_fill_manual(values=c("Green","Yellow")) +
+	ggtitle("m5C Categorization Between Comparisons") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Counts")
 
-# ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Count_(UNIQ1v2).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-# barsProportion <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "fill", stat = "identity") +
-# 	scale_fill_manual(values=c("Green","Yellow")) +
-# 	scale_y_continuous(labels = scales::percent_format()) +
-# 	ggtitle("m5C Categorization Between Comparisons (%)") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Proportion")
+barsProportion <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "fill", stat = "identity") +
+	scale_fill_manual(values=c("Green","Yellow")) +
+	scale_y_continuous(labels = scales::percent_format()) +
+	ggtitle("m5C Categorization Between Comparisons (%)") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Proportion")
 
-# ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Percentage_(UNIQ1v2).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 ## All
 ## x-axis
@@ -197,7 +197,7 @@ trend = c()
 counts = c()
 
 sources = append(sources, c("rRNA", "rRNA", "rRNA", "rRNA", "rRNA", "tRNA", "tRNA", "tRNA", "tRNA", "tRNA", "miRNA", "miRNA", "miRNA", "miRNA", "miRNA", "piRNA", "piRNA", "piRNA", "piRNA", "piRNA", "Genome", "Genome", "Genome", "Genome", "Genome", "circRNA", "circRNA", "circRNA", "circRNA", "circRNA"))
-trend = append(trend, c("Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+trend = append(trend, c("Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2"))
 counts = append(counts, c(uprRNA, downrRNA, unchangedrRNA, uniq1rRNA, uniq2rRNA, uptRNA, downtRNA, unchangedtRNA, uniq1tRNA, uniq2tRNA, upmiRNA, downmiRNA, unchangedmiRNA, uniq1miRNA, uniq2miRNA, uppiRNA, downpiRNA, unchangedpiRNA, uniq1piRNA, uniq2piRNA, upGenome, downGenome, unchangedGenome, uniq1Genome, uniq2Genome, upcircRNA, downcircRNA, unchangedcircRNA, uniq1circRNA, uniq2circRNA ))
 
 ## save table with all info
@@ -214,37 +214,37 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", "uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-# bars <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "stack", stat = "identity") +
-# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-# 	ggtitle("m5C Categorization Between Comparisons") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Counts")
+bars <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "stack", stat = "identity") +
+	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+	ggtitle("m5C Categorization Between Comparisons") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Counts")
 
-# ggsave(paste0(outPrefix, "_Count_(All).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Count_(All).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Count_(All).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Count_(All).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-# barsProportion <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "fill", stat = "identity") +
-# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-# 	scale_y_continuous(labels = scales::percent_format()) +
-# 	ggtitle("m5C Categorization Between Comparisons (%)") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Source") +
-# 	ylab("Proportion")
+barsProportion <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "fill", stat = "identity") +
+	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+	scale_y_continuous(labels = scales::percent_format()) +
+	ggtitle("m5C Categorization Between Comparisons (%)") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Source") +
+	ylab("Proportion")
 
-# ggsave(paste0(outPrefix, "_Percentage_(All).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Percentage_(All).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Percentage_(All).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Percentage_(All).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
 
 ## All Sources in one bar
@@ -258,7 +258,7 @@ trend = c()
 counts = c()
 
 sources = append(sources, c(compName, compName, compName, compName))
-trend = append(trend, c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+trend = append(trend, c("Up", "Down", "uniq1", "uniq2"))
 counts = append(counts, c(sumUp, sumDown, sumUniq1, sumUniq2))
 
 tmpList <- list(sources, trend, counts)
@@ -268,34 +268,34 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", "uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
-# bars <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "stack", stat = "identity") +
-# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-# 	ggtitle("m5C Categorization Between Comparisons") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Comparison") +
-# 	ylab("Counts")
+bars <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "stack", stat = "identity") +
+	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+	ggtitle("m5C Categorization Between Comparisons") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Comparison") +
+	ylab("Counts")
 
-# ggsave(paste0(outPrefix, "_Count_(Single).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Count_(Single).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Count_(Single).png"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Count_(Single).pdf"), bars, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
 
-# barsProportion <- ggplot(testDF,
-#                aes(x = Source,
-#                    y = Counts,
-#                    fill = Trend)) +
-#     geom_bar(position = "fill", stat = "identity") +
-# 	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
-# 	scale_y_continuous(labels = scales::percent_format()) +
-# 	ggtitle("m5C Categorization Between Comparisons (%)") +
-# 	theme(plot.title = element_text(hjust = 0.5)) +
-# 	xlab("Comparison") +
-# 	ylab("Proportion")
+barsProportion <- ggplot(testDF,
+               aes(x = Source,
+                   y = Counts,
+                   fill = Trend)) +
+    geom_bar(position = "fill", stat = "identity") +
+	scale_fill_manual(values=c("Red", "Blue", "Green","Yellow")) +
+	scale_y_continuous(labels = scales::percent_format()) +
+	ggtitle("m5C Categorization Between Comparisons (%)") +
+	theme(plot.title = element_text(hjust = 0.5)) +
+	xlab("Comparison") +
+	ylab("Proportion")
 
-# ggsave(paste0(outPrefix, "_Percentage_(Single).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
-# ggsave(paste0(outPrefix, "_Percentage_(Single).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")
+ggsave(paste0(outPrefix, "_Percentage_(Single).png"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "png")
+ggsave(paste0(outPrefix, "_Percentage_(Single).pdf"), barsProportion, width = 5, height = 4, dpi = 150, units = "in", device = "pdf")

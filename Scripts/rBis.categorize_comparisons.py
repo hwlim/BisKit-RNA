@@ -84,11 +84,11 @@ def differential(row):
         
         ## if first sample does not have enough replicates and second sample has enough replicates, uniq to sample 2
         if (numReps[0] < minReps) and (numReps[1] >= minReps):
-            result = f"Unique to {sampleNames[1]}"
+            result = "uniq2"
         
         ## if second sample does not have enough replicates and first sample has enough replicates, uniq to sample 1
         elif (numReps[1] < minReps) and (numReps[0] >= minReps):
-            result = f"Unique to {sampleNames[0]}"
+            result = "uniq1"
         
         ## if both samples don't have enough replicates, NA
         elif (numReps[0] < minReps) and (numReps[1] < minReps):
@@ -104,9 +104,9 @@ def differential(row):
             if math.isnan(float(covSample1)) and math.isnan(float(covSample2)):
                 result = "NA"
             elif math.isnan(float(covSample1)) and float(covSample2) > 0:
-                result = f"Unique to {sampleNames[1]}"
+                result = "uniq2"
             elif math.isnan(float(covSample2)) and float(covSample1) > 0:
-                result = f"Unique to {sampleNames[0]}"
+                result = "uniq1"
             else:
                 result = "UNCHANGED"
 
@@ -216,8 +216,8 @@ if reps:
 ## make dataframe and name columns by unique list
 df2 = pd.DataFrame(counts).T
 df2.columns = unique
-df2.rename(columns={f'Unique to {sampleNames[0]}': 'uniq1'}, inplace=True)
-df2.rename(columns={f'Unique to {sampleNames[1]}': 'uniq2'}, inplace=True)
+# df2.rename(columns={f'Unique to {sampleNames[0]}': 'uniq1'}, inplace=True)
+# df2.rename(columns={f'Unique to {sampleNames[1]}': 'uniq2'}, inplace=True)
 
 ## organize columns
 df2.columns = ['Comparison'] + df2.columns[1:].tolist()

@@ -1974,7 +1974,7 @@ rule draw_categorizations_by_source_per_pairwise:
 	input:
 		categorization = compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/categorized_pairwise_comparison.tsv"
 	output:
-		# plots = expand(compare_dir + "/{{diffPairName}}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source_{ext}_{cat}", diffPairName=diffPairNameL,  ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf", "(Single).png", "(Single).pdf"]),
+		plots = expand(compare_dir + "/{{diffPairName}}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source_{ext}_{cat}", diffPairName=diffPairNameL,  ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf", "(Single).png", "(Single).pdf"]),
 		table = compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source.tsv"
 	message:
 		"Categorizing comparison between two samples... [{wildcards.diffPairName}]"
@@ -1989,25 +1989,25 @@ rule draw_categorizations_by_source_per_pairwise:
 		{input.categorization}
 		"""
 
-# rule combine_all_categorization_tables:
-# 	input:
-# 		categorization = expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source.tsv", diffPairName=diffPairNameL)
-# 	output:
-# 		table = combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Categorization_By_Source_For_All_Pairwise_Comparisons.tsv"
-# 	message:
-# 		"Combining all pairwise categorizations..."
-# 	shell:
-# 		"""
-# 		echo | awk -vs="Comparisons" -va="UP" -vb="DOWN" -ve="UNCHANGED" -vc="uniq1" -vd="uniq2" '{{ print s"\t"a"\t"b"\t"e"\t"c"\t"d }}' > $TMPDIR/tmp.tsv
-# 		cat $TMPDIR/tmp.tsv {input.categorization} > {output.table}
-# 		rm $TMPDIR/tmp.tsv
-# 		"""
+rule combine_all_categorization_tables:
+	input:
+		categorization = expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir + "/Categorization_By_Source.tsv", diffPairName=diffPairNameL)
+	output:
+		table = combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Categorization_By_Source_For_All_Pairwise_Comparisons.tsv"
+	message:
+		"Combining all pairwise categorizations..."
+	shell:
+		"""
+		echo | awk -vs="Comparisons" -va="UP" -vb="DOWN" -ve="UNCHANGED" -vc="uniq1" -vd="uniq2" '{{ print s"\t"a"\t"b"\t"e"\t"c"\t"d }}' > $TMPDIR/tmp.tsv
+		cat $TMPDIR/tmp.tsv {input.categorization} > {output.table}
+		rm $TMPDIR/tmp.tsv
+		"""
 
 rule draw_categorizations_pairwise:
 	input:
 		categorizationStats = expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/stats.tsv", diffPairName=diffPairNameL)
 	output:
-		# plots = expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Differential_Analysis_Categorization_{ext}_{cat}", ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf"]),
+		plots = expand(combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/Differential_Analysis_Categorization_{ext}_{cat}", ext=["Count", "Percentage"], cat=["(UPvDOWN).png", "(UPvDOWN).pdf", "(UNIQ1v2).png", "(UNIQ1v2).pdf", "(All).png", "(All).pdf"]),
 		table = mqc_dir + "/Differential_Analysis_Categorization.tsv"
 	message:
 		"Categorizing comparison between two samples..."
