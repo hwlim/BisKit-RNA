@@ -88,8 +88,15 @@ sumUniq1 = uniq1rRNA + uniq1tRNA + uniq1miRNA + uniq1piRNA + uniq1Genome + uniq1
 sumUniq2 = uniq2rRNA + uniq2tRNA + uniq2miRNA + uniq2piRNA + uniq2Genome + uniq2circRNA
 
 ## UP and DOWN
-sources = append(sources, c("rRNA", "rRNA", "tRNA", "tRNA", "miRNA", "miRNA", "piRNA", "piRNA", "Genome", "Genome", "circRNA", "circRNA"))
-trend = append(trend, c("Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down"))
+sources = append(sources, c(
+    rep("rRNA", 2), 
+    rep("tRNA", 2), 
+    rep("miRNA", 2), 
+    rep("piRNA", 2), 
+    rep("Genome", 2), 
+    rep("circRNA", 2)
+))
+trend = append(trend, rep(c("Up", "Down"), times = 6))
 counts = append(counts, c(uprRNA, downrRNA, uptRNA, downtRNA, upmiRNA, downmiRNA, uppiRNA, downpiRNA, upGenome, downGenome, upcircRNA, downcircRNA))
 
 tmpList <- list(sources, trend, counts)
@@ -143,8 +150,15 @@ trend = c()
 ## y-axis
 counts = c()
 
-sources = append(sources, c("rRNA", "rRNA", "tRNA", "tRNA", "miRNA", "miRNA", "piRNA", "piRNA", "Genome", "Genome", "circRNA", "circRNA"))
-trend = append(trend, c("uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2", "uniq1", "uniq2"))
+sources = append(sources, c(
+    rep("rRNA", 2), 
+    rep("tRNA", 2), 
+    rep("miRNA", 2), 
+    rep("piRNA", 2), 
+    rep("Genome", 2), 
+    rep("circRNA", 2)
+))
+trend = append(trend, rep(c("uniq1", "uniq2"), times = 6))
 counts = append(counts, c(uniq1rRNA, uniq2rRNA, uniq1tRNA, uniq2tRNA, uniq1miRNA, uniq2miRNA, uniq1piRNA, uniq2piRNA, uniq1Genome, uniq2Genome, uniq1circRNA, uniq2circRNA))
 
 tmpList <- list(sources, trend, counts)
@@ -196,8 +210,15 @@ trend = c()
 ## y-axis
 counts = c()
 
-sources = append(sources, c("rRNA", "rRNA", "rRNA", "rRNA", "rRNA", "tRNA", "tRNA", "tRNA", "tRNA", "tRNA", "miRNA", "miRNA", "miRNA", "miRNA", "miRNA", "piRNA", "piRNA", "piRNA", "piRNA", "piRNA", "Genome", "Genome", "Genome", "Genome", "Genome", "circRNA", "circRNA", "circRNA", "circRNA", "circRNA"))
-trend = append(trend, c("Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2", "Up", "Down", "Unchanged", "uniq1", "uniq2"))
+sources = append(sources, c(
+    rep("rRNA", 5), 
+    rep("tRNA", 5), 
+    rep("miRNA", 5), 
+    rep("piRNA", 5), 
+    rep("Genome", 5), 
+    rep("circRNA", 5)
+))
+trend = append(trend, rep(c("Up", "Down", "Unchanged", "uniq1", "uniq2"), times = 6))
 counts = append(counts, c(uprRNA, downrRNA, unchangedrRNA, uniq1rRNA, uniq2rRNA, uptRNA, downtRNA, unchangedtRNA, uniq1tRNA, uniq2tRNA, upmiRNA, downmiRNA, unchangedmiRNA, uniq1miRNA, uniq2miRNA, uppiRNA, downpiRNA, unchangedpiRNA, uniq1piRNA, uniq2piRNA, upGenome, downGenome, unchangedGenome, uniq1Genome, uniq2Genome, upcircRNA, downcircRNA, unchangedcircRNA, uniq1circRNA, uniq2circRNA ))
 
 ## save table with all info
