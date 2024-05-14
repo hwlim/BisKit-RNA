@@ -2086,6 +2086,8 @@ rule draw_mbias_plot_genome:
 
 	shell:
 		"""
+		module purge
+		module load samtools/1.18.0
 		module load python3/3.6.3
 
 		mkdir -p {mqc_dir}
@@ -2113,7 +2115,7 @@ rule draw_mbias_plot_rRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 		module load samtools/1.18.0
 
@@ -2141,7 +2143,7 @@ rule draw_mbias_plot_tRNA:
 		"Creating m-bias plot for tRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 		module load samtools/1.18.0
 
@@ -2170,6 +2172,7 @@ rule draw_mbias_plot_miRNA:
 
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 		module load samtools/1.18.0
 
@@ -2198,7 +2201,7 @@ rule draw_mbias_plot_piRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 		module load samtools/1.18.0
 
@@ -2234,7 +2237,7 @@ rule draw_mbias_plot_circRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 		module load samtools/1.18.0
 
