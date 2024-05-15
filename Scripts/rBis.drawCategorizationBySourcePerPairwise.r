@@ -6,10 +6,18 @@ suppressPackageStartupMessages(library('data.table', quiet=TRUE))
 
 # command line option handling
 option_list <- list(
-	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=allReadsStratification")
+	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=m5cSignificant"),
+	make_option(c("-g","--groupList"), help="a string of groups separated by comma")
 )
 parser <- OptionParser(usage = "%prog [options] <tsv>", option_list=option_list,
-			description = "Draw bar plot of proportion of significant m5C candidates per Source.")
+			description = "Draw bar plot of proportion of significant m5C candidates per Source and output table.
+			Input:
+				- categorized_pairwise_comparison.tsv
+				- list of groups involved
+			Output:
+				- static plots for read categorization
+				- table containing read categorization
+			")
 arguments <- parse_args(parser, positional_arguments = TRUE)
 if(length(arguments$args) == 0) {
 	print_help(parser)
@@ -18,11 +26,11 @@ if(length(arguments$args) == 0) {
 	src=arguments$args
 }
 
-# print(srcL)
-
 # Option handling
 opt=arguments$options
 outPrefix=opt$outPrefix
+samp1=strsplit( opt$groupList, "," )[[1]][1]
+samp2=strsplit( opt$groupList, "," )[[1]][2]
 
 ## x-axis
 sources = c()
@@ -34,46 +42,45 @@ trend = c()
 counts = c()
 
 statsTable <- read.table(file = src, sep = '\t', header = TRUE, comment.char = "")
-compName = tail(strsplit(src, "/")[[1]], n=3)[1]
-samp1 = strsplit(compName, "_vs_")[[1]][1]
-samp2 = strsplit(compName, "_vs_")[[1]][2]
+# compName = tail(strsplit(src, "/")[[1]], n=3)[1]
+compName = paste0(samp1, "_vs_", samp2)
 
 ## select row based on column values
-uprRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "rRNA",])
-downrRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "rRNA",])
-unchangedrRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "rRNA",])
-uniq1rRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "rRNA",])
-uniq2rRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "rRNA",])
+uprRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "rRNA"))
+downrRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "rRNA"))
+unchangedrRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "rRNA"))
+uniq1rRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "rRNA"))
+uniq2rRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "rRNA"))
 
-uptRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "tRNA",])
-downtRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "tRNA",])
-unchangedtRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "tRNA",])
-uniq1tRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "tRNA",])
-uniq2tRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "tRNA",])
+uptRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "tRNA"))
+downtRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "tRNA"))
+unchangedtRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "tRNA"))
+uniq1tRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "tRNA"))
+uniq2tRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "tRNA"))
 
-upmiRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "miRNA",])
-downmiRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "miRNA",])
-unchangedmiRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "miRNA",])
-uniq1miRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "miRNA",])
-uniq2miRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "miRNA",])
+upmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "miRNA"))
+downmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "miRNA"))
+unchangedmiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "miRNA"))
+uniq1miRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "miRNA"))
+uniq2miRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "miRNA"))
 
-uppiRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "piRNA",])
-downpiRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "piRNA",])
-unchangedpiRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "piRNA",])
-uniq1piRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "piRNA",])
-uniq2piRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "piRNA",])
+uppiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "piRNA"))
+downpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "piRNA"))
+unchangedpiRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "piRNA"))
+uniq1piRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "piRNA"))
+uniq2piRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "piRNA"))
 
-upGenome = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "Genome",])
-downGenome = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "Genome",])
-unchangedGenome = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "Genome",])
-uniq1Genome = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "Genome",])
-uniq2Genome = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "Genome",])
+upGenome = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "Genome"))
+downGenome = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "Genome"))
+unchangedGenome = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "Genome"))
+uniq1Genome = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "Genome"))
+uniq2Genome = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "Genome"))
 
-upcircRNA = nrow(statsTable[statsTable[[compName]] == 'UP' & statsTable$Source == "circRNA",])
-downcircRNA = nrow(statsTable[statsTable[[compName]] == 'DOWN' & statsTable$Source == "circRNA",])
-unchangedcircRNA = nrow(statsTable[statsTable[[compName]] == 'UNCHANGED' & statsTable$Source == "circRNA",])
-uniq1circRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp1) & statsTable$Source == "circRNA",])
-uniq2circRNA = nrow(statsTable[statsTable[[compName]] == paste0('Unique to ', samp2) & statsTable$Source == "circRNA",])
+upcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UP" & Source == "circRNA"))
+downcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "DOWN" & Source == "circRNA"))
+unchangedcircRNA = nrow(subset(statsTable, statsTable[[compName]] == "UNCHANGED" & Source == "circRNA"))
+uniq1circRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq1" & Source == "circRNA"))
+uniq2circRNA = nrow(subset(statsTable, statsTable[[compName]] == "uniq2" & Source == "circRNA"))
 
 sumUp = uprRNA + uptRNA + upmiRNA + uppiRNA + upGenome + upcircRNA
 sumDown = downrRNA + downtRNA + downmiRNA + downpiRNA + downGenome + downcircRNA
@@ -81,8 +88,15 @@ sumUniq1 = uniq1rRNA + uniq1tRNA + uniq1miRNA + uniq1piRNA + uniq1Genome + uniq1
 sumUniq2 = uniq2rRNA + uniq2tRNA + uniq2miRNA + uniq2piRNA + uniq2Genome + uniq2circRNA
 
 ## UP and DOWN
-sources = append(sources, c("rRNA", "rRNA", "tRNA", "tRNA", "miRNA", "miRNA", "piRNA", "piRNA", "Genome", "Genome", "circRNA", "circRNA"))
-trend = append(trend, c("Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down", "Up", "Down"))
+sources = append(sources, c(
+    rep("rRNA", 2), 
+    rep("tRNA", 2), 
+    rep("miRNA", 2), 
+    rep("piRNA", 2), 
+    rep("Genome", 2), 
+    rep("circRNA", 2)
+))
+trend = append(trend, rep(c("Up", "Down"), times = 6))
 counts = append(counts, c(uprRNA, downrRNA, uptRNA, downtRNA, upmiRNA, downmiRNA, uppiRNA, downpiRNA, upGenome, downGenome, upcircRNA, downcircRNA))
 
 tmpList <- list(sources, trend, counts)
@@ -136,8 +150,15 @@ trend = c()
 ## y-axis
 counts = c()
 
-sources = append(sources, c("rRNA", "rRNA", "tRNA", "tRNA", "miRNA", "miRNA", "piRNA", "piRNA", "Genome", "Genome", "circRNA", "circRNA"))
-trend = append(trend, c(paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2), paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+sources = append(sources, c(
+    rep("rRNA", 2), 
+    rep("tRNA", 2), 
+    rep("miRNA", 2), 
+    rep("piRNA", 2), 
+    rep("Genome", 2), 
+    rep("circRNA", 2)
+))
+trend = append(trend, rep(c("uniq1", "uniq2"), times = 6))
 counts = append(counts, c(uniq1rRNA, uniq2rRNA, uniq1tRNA, uniq2tRNA, uniq1miRNA, uniq2miRNA, uniq1piRNA, uniq2piRNA, uniq1Genome, uniq2Genome, uniq1circRNA, uniq2circRNA))
 
 tmpList <- list(sources, trend, counts)
@@ -147,7 +168,7 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c(paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
 bars <- ggplot(testDF,
@@ -189,8 +210,15 @@ trend = c()
 ## y-axis
 counts = c()
 
-sources = append(sources, c("rRNA", "rRNA", "rRNA", "rRNA", "rRNA", "tRNA", "tRNA", "tRNA", "tRNA", "tRNA", "miRNA", "miRNA", "miRNA", "miRNA", "miRNA", "piRNA", "piRNA", "piRNA", "piRNA", "piRNA", "Genome", "Genome", "Genome", "Genome", "Genome", "circRNA", "circRNA", "circRNA", "circRNA", "circRNA"))
-trend = append(trend, c("Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2), "Up", "Down", "Unchanged", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+sources = append(sources, c(
+    rep("rRNA", 5), 
+    rep("tRNA", 5), 
+    rep("miRNA", 5), 
+    rep("piRNA", 5), 
+    rep("Genome", 5), 
+    rep("circRNA", 5)
+))
+trend = append(trend, rep(c("Up", "Down", "Unchanged", "uniq1", "uniq2"), times = 6))
 counts = append(counts, c(uprRNA, downrRNA, unchangedrRNA, uniq1rRNA, uniq2rRNA, uptRNA, downtRNA, unchangedtRNA, uniq1tRNA, uniq2tRNA, upmiRNA, downmiRNA, unchangedmiRNA, uniq1miRNA, uniq2miRNA, uppiRNA, downpiRNA, unchangedpiRNA, uniq1piRNA, uniq2piRNA, upGenome, downGenome, unchangedGenome, uniq1Genome, uniq2Genome, upcircRNA, downcircRNA, unchangedcircRNA, uniq1circRNA, uniq2circRNA ))
 
 ## save table with all info
@@ -207,7 +235,7 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", "uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
 bars <- ggplot(testDF,
@@ -251,7 +279,7 @@ trend = c()
 counts = c()
 
 sources = append(sources, c(compName, compName, compName, compName))
-trend = append(trend, c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+trend = append(trend, c("Up", "Down", "uniq1", "uniq2"))
 counts = append(counts, c(sumUp, sumDown, sumUniq1, sumUniq2))
 
 tmpList <- list(sources, trend, counts)
@@ -261,7 +289,7 @@ setDT(testDF)
 
 colnames(testDF) <- c('Source','Trend','Counts')
 
-testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", paste0("Unique to ", samp1), paste0("Unique to ", samp2)))
+testDF$Trend <- factor(testDF$Trend, levels=c("Up", "Down", "uniq1", "uniq2"))
 testDF$Source <- factor(testDF$Source, levels=(unique(testDF$Source)))
 
 bars <- ggplot(testDF,

@@ -34,7 +34,7 @@ rule align_se_rRNA:
 	message:
 		"Aligning... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align"
 	shell:
@@ -71,12 +71,16 @@ rule post_process_bam_rRNA:
 	input:
 		fq1 = lambda wildcards: get_fastq(wildcards.sampleName),
 		unalignedFq = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/unaligned_pre.fq.gz",
-		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.bam.bai"
 	output:
 		newUnaligned = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/unaligned.fq.gz",
 		plusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam.bai",
 		plusUniqBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam",
-		minusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam"
+		plusUniqBamBai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam.bai"
 	message:
 		"Post-processing bam file from rRNA alignment... [{wildcards.sampleName}]"
 
@@ -95,22 +99,27 @@ rule post_process_bam_rRNA:
 rule get_read_stats_rRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.minus.bam.bai",
+		unalignedFQ = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/unaligned.fq.gz",
 	output:
 		readStats = sample_dir + "/{sampleName}/" + rRNA_dir + "/readStats.tsv"
 	message:
 		"Counting reads used in mpileup for rRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
-		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName}
+		module load samtools/1.18.0
+		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
 
 rule run_samtools_mpileup_all_rRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.bam.bai"
 	output:
 		table = sample_dir + "/{sampleName}/" + rRNA_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -134,7 +143,8 @@ rule run_samtools_mpileup_all_rRNA:
 
 rule run_samtools_mpileup_uniq_rRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam.bai"
 	output:
 		table = sample_dir + "/{sampleName}/" + rRNA_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -230,7 +240,7 @@ rule align_se_tRNA:
 	message:
 		"Aligning tRNA... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align"
 	shell:
@@ -268,12 +278,16 @@ rule post_process_bam_tRNA:
 	input:
 		fq1 = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/unaligned.fq.gz",
 		unalignedFq = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/unaligned_pre.fq.gz",
-		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.bam.bai",
 	output:
 		newUnaligned = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/unaligned.fq.gz",
 		plusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam.bai",
 		plusUniqBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam",
-		minusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam"
+		plusUniqBamBai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam.bai",
 	message:
 		"Post-processing bam file from tRNA alignment... [{wildcards.sampleName}]"
 
@@ -291,7 +305,8 @@ rule post_process_bam_tRNA:
 
 rule feature_count_all_tRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_all.txt"
 	message:
@@ -305,7 +320,8 @@ rule feature_count_all_tRNA:
 
 rule feature_count_uniq_tRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam.bai"
 	output:
 		cnt = sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_uniq.txt"
 	message:
@@ -320,22 +336,27 @@ rule feature_count_uniq_tRNA:
 rule get_read_stats_tRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.minus.bam.bai",
+		unalignedFQ = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/unaligned.fq.gz",
 	output:
 		readStats = sample_dir + "/{sampleName}/" + tRNA_dir + "/readStats.tsv"
 	message:
 		"Counting reads used in mpileup for tRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
-		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName}
+		module load samtools/1.18.0
+		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
 
 rule run_samtools_mpileup_all_tRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.bam.bai"
 	output:
 		table = sample_dir + "/{sampleName}/" + tRNA_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -360,7 +381,8 @@ rule run_samtools_mpileup_all_tRNA:
 
 rule run_samtools_mpileup_uniq_tRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + tRNA_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -457,7 +479,7 @@ rule align_se_miRNA:
 	message:
 		"Aligning miRNA... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align"
 	shell:
@@ -493,12 +515,16 @@ rule post_process_bam_miRNA:
 	input:
 		fq1 = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/unaligned.fq.gz",
 		unalignedFq = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/unaligned_pre.fq.gz",
-		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.bam.bai"
 	output:
 		newUnaligned = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/unaligned.fq.gz",
 		plusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam.bai",
 		plusUniqBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam",
-		minusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam"
+		plusUniqBamBai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam.bai"
 	message:
 		"Post-processing bam file from miRNA alignment... [{wildcards.sampleName}]"
 
@@ -516,7 +542,8 @@ rule post_process_bam_miRNA:
 
 rule feature_count_all_miRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam.bai"
 	output:
 		cnt = sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_all.txt",
 		summary = sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_all.txt.summary",
@@ -531,7 +558,8 @@ rule feature_count_all_miRNA:
 
 rule feature_count_uniq_miRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam.bai"
 	output:
 		cnt = sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_uniq.txt",
 		summary = sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_uniq.txt.summary",
@@ -547,21 +575,26 @@ rule feature_count_uniq_miRNA:
 rule get_read_stats_miRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.minus.bam.bai",
+		unalignedFQ = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/unaligned.fq.gz",
 	output:
 		readStats = sample_dir + "/{sampleName}/" + miRNA_dir + "/readStats.tsv"
 	message:
 		"Counting reads used in mpileup for miRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
-		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName}
+		module load samtools/1.18.0
+		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
 rule run_samtools_mpileup_all_miRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.bam.bai"
 	output:
 		table = sample_dir + "/{sampleName}/" + miRNA_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -586,7 +619,8 @@ rule run_samtools_mpileup_all_miRNA:
 
 rule run_samtools_mpileup_uniq_miRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + miRNA_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -681,7 +715,7 @@ rule align_se_piRNA:
 	message:
 		"Aligning piRNA... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align"
 	shell:
@@ -717,12 +751,16 @@ rule post_process_bam_piRNA:
 	input:
 		fq1 = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/unaligned.fq.gz",
 		unalignedFq = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/unaligned_pre.fq.gz",
-		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.bam.bai",
 	output:
 		newUnaligned = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/unaligned.fq.gz",
 		plusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam.bai",
 		plusUniqBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam",
-		minusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam"
+		plusUniqBamBai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam.bai",
 	message:
 		"Post-processing bam file from piRNA alignment... [{wildcards.sampleName}]"
 
@@ -740,7 +778,8 @@ rule post_process_bam_piRNA:
 
 rule feature_count_all_piRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_all.txt"
 	message:
@@ -753,7 +792,8 @@ rule feature_count_all_piRNA:
 
 rule feature_count_uniq_piRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_uniq.txt"
 	message:
@@ -767,8 +807,12 @@ rule feature_count_uniq_piRNA:
 rule get_read_stats_piRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.minus.bam.bai",
+		unalignedFQ = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/unaligned.fq.gz",
 
 	output:
 		readStats = sample_dir + "/{sampleName}/" + piRNA_dir + "/readStats.tsv"
@@ -776,13 +820,14 @@ rule get_read_stats_piRNA:
 		"Counting reads used in mpileup for piRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
-		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName}
+		module load samtools/1.18.0
+		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
 rule run_samtools_mpileup_all_piRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + piRNA_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -806,7 +851,8 @@ rule run_samtools_mpileup_all_piRNA:
 
 rule run_samtools_mpileup_uniq_piRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + piRNA_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -901,7 +947,7 @@ rule align_se_genome:
 	message:
 		"Aligning genome... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + genome_dir + "/Align"
 	shell:
@@ -936,11 +982,15 @@ rule get_align_stat_genome:
 
 rule post_process_bam_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai",
 	output:
 		uniqBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam",
+		uniqBamBai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam.bai"
 	message:
 		"Post-processing bam file from genome alignment... [{wildcards.sampleName}]"
 
@@ -965,6 +1015,7 @@ rule post_process_bam_genome:
 		samtools view {input.bam} | grep -w "NH:i:1" > $TMPDIR/{wildcards.sampleName}.genome.tmp
 		cat {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt $TMPDIR/{wildcards.sampleName}.genome.tmp > $TMPDIR/{wildcards.sampleName}.genome.tmp.sam
 		samtools view -bS $TMPDIR/{wildcards.sampleName}.genome.tmp.sam > {output.uniqBam}
+		samtools index {output.uniqBam}
 
 		rm {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt
 		rm $TMPDIR/{wildcards.sampleName}.genome.tmp
@@ -974,7 +1025,8 @@ rule post_process_bam_genome:
 
 rule feature_count_all_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_all.txt",
 		summary = sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_all.txt.summary",
@@ -989,7 +1041,8 @@ rule feature_count_all_genome:
 
 rule feature_count_uniq_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_uniq.txt",
 		summary = sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_uniq.txt.summary",
@@ -1005,8 +1058,12 @@ rule feature_count_uniq_genome:
 rule get_read_stats_genome:
 	input:
 		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai",
 		plusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam",
-		minusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam"
+		plusBamBai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.plus.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.minus.bam.bai",
+		unalignedFQ = sample_dir + "/{sampleName}/" + genome_dir + "/Align/unaligned.fq.gz",
 
 	output:
 		readStats = sample_dir + "/{sampleName}/" + genome_dir + "/readStats.tsv"
@@ -1014,13 +1071,14 @@ rule get_read_stats_genome:
 		"Counting reads used in mpileup for genome... [{wildcards.sampleName}]"
 	shell:
 		"""
-
-		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName}
+		module load samtools/1.18.0
+		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
 rule run_samtools_mpileup_all_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai"
 	output:
 		table = sample_dir + "/{sampleName}/" + genome_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -1045,7 +1103,8 @@ rule run_samtools_mpileup_all_genome:
 
 rule run_samtools_mpileup_uniq_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.uniq.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + genome_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -1146,7 +1205,7 @@ rule align_se_circRNA:
 	message:
 		"Aligning circRNA... [{wildcards.sampleName}]"
 	threads:
-		cluster["align_pe"]["cpu"]
+		cluster["align_se"]["cpu"]
 	params:
 		desDir = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align"
 	shell:
@@ -1182,12 +1241,16 @@ rule post_process_bam_circRNA:
 	input:
 		fq1 = sample_dir + "/{sampleName}/" + genome_dir + "/Align/unaligned.fq.gz",
 		unalignedFq = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/unaligned_pre.fq.gz",
-		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.bam.bai",
 	output:
 		newUnaligned = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/unaligned.fq.gz",
 		plusBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam.bai",
 		plusUniqBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam",
-		minusBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.minus.bam"
+		plusUniqBamBai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam.bai",
+		minusBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.minus.bam.bai",
 	message:
 		"Post-processing bam file from circRNA alignment... [{wildcards.sampleName}]"
 
@@ -1205,7 +1268,8 @@ rule post_process_bam_circRNA:
 
 rule feature_count_all_circRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_all.txt"
 	message:
@@ -1218,7 +1282,8 @@ rule feature_count_all_circRNA:
 
 rule feature_count_uniq_circRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		cnt = sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_uniq.txt"
 	message:
@@ -1266,7 +1331,9 @@ rule get_read_stats_circRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.bam",
 		plusBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam",
+		plusBamBai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam.bai",
 		minusBam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.minus.bam",
+		minusBamBai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.minus.bam.bai",
 		unalignedFQ = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/unaligned.fq.gz"
 
 	output:
@@ -1275,14 +1342,14 @@ rule get_read_stats_circRNA:
 		"Counting reads used in mpileup for circRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
+		module load samtools/1.18.0
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
-
 		"""
 
 rule run_samtools_mpileup_all_circRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam"
+		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + circRNA_dir + "/mpileup_out_raw_all.tsv"
 	message:
@@ -1307,7 +1374,8 @@ rule run_samtools_mpileup_all_circRNA:
 
 rule run_samtools_mpileup_uniq_circRNA:
 	input:
-		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam"
+		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam.bai",
 	output:
 		table = sample_dir + "/{sampleName}/" + circRNA_dir + "/mpileup_out_raw_uniq.tsv"
 	message:
@@ -1858,7 +1926,8 @@ rule merge_all_pairwise:
 		module load python3/3.6.3
 		rBis.merge_all_pairwise.py \
 		-p {input.pairwises} \
-		-o {combined_compare_dir}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}
+		-o {combined_compare_dir}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh} \
+		-d "{diffPairNameDict}"
 		"""
 
 
@@ -1899,6 +1968,8 @@ rule draw_sig_m5C_proportion_all_samples:
 		-o {plot_dir}/Significant_Candidate {input.mergedCallStats} -t {sig_type_call}
 		"""
 
+
+
 rule draw_categorizations_by_source_per_pairwise:
 	input:
 		categorization = compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/categorized_pairwise_comparison.tsv"
@@ -1908,12 +1979,14 @@ rule draw_categorizations_by_source_per_pairwise:
 	message:
 		"Categorizing comparison between two samples... [{wildcards.diffPairName}]"
 	params:
-		desDir = compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir
+		groupList = lambda wildcards: get_group(wildcards.diffPairName)
 	shell:
 		"""
 		module load R/4.1.1
 		rBis.drawCategorizationBySourcePerPairwise.r \
-		-o {compare_dir}/{wildcards.diffPairName}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/{per_pairwise_plot_dir}/Categorization_By_Source {input.categorization}
+		-o {compare_dir}/{wildcards.diffPairName}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/{per_pairwise_plot_dir}/Categorization_By_Source \
+		-g {params.groupList} \
+		{input.categorization}
 		"""
 
 rule combine_all_categorization_tables:
@@ -2049,7 +2122,8 @@ rule create_multiqc:
 
 rule get_readLen_genome:
 	input:
-		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam"
+		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai"
 
 	output:
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
@@ -2075,6 +2149,7 @@ rule get_readLen_genome:
 rule draw_mbias_plot_genome:
 	input:
 		bam = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam",
+		bai = sample_dir + "/{sampleName}/" + genome_dir + "/Align/align.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:
@@ -2089,6 +2164,7 @@ rule draw_mbias_plot_genome:
 		module purge
 		module load samtools/1.18.0
 		module load python3/3.6.3
+		module load samtools/1.18.0
 
 		mkdir -p {mqc_dir}
 
@@ -2104,6 +2180,7 @@ rule draw_mbias_plot_genome:
 rule draw_mbias_plot_rRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + rRNA_dir + "/Align/align.plus.uniq.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:
@@ -2133,6 +2210,7 @@ rule draw_mbias_plot_rRNA:
 rule draw_mbias_plot_tRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + tRNA_dir + "/Align/align.plus.uniq.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:
@@ -2161,6 +2239,7 @@ rule draw_mbias_plot_tRNA:
 rule draw_mbias_plot_miRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + miRNA_dir + "/Align/align.plus.uniq.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:
@@ -2190,6 +2269,7 @@ rule draw_mbias_plot_miRNA:
 rule draw_mbias_plot_piRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + piRNA_dir + "/Align/align.plus.uniq.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:
@@ -2226,6 +2306,7 @@ rule draw_mbias_plot_piRNA:
 rule draw_mbias_plot_circRNA:
 	input:
 		bam = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam",
+		bai = sample_dir + "/{sampleName}/" + circRNA_dir + "/Align/align.plus.uniq.bam.bai",
 		readLenGenome = sample_dir + "/{sampleName}/" + genome_dir + "/readLenGenome.txt"
 
 	output:

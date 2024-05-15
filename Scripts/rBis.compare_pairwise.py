@@ -29,6 +29,7 @@ outFile = args.outFile
 comparison = args.comparisonPair
 minReps = args.minReps
 groupList = args.groupList.split(",")
+compareSamp=f'{groupList[0]}_vs_{groupList[1]}'
 
 ## import group as dictionary from command line
 sampleFile = args.sampleFile
@@ -235,16 +236,16 @@ for group in groups:
 
 ## compare
 ## get delta methylation rate
-masterDF[f"delta_MethRate_{comparison}"] = masterDF.apply(deltaMethRate, axis=1)
+masterDF[f"delta_MethRate_{compareSamp}"] = masterDF.apply(deltaMethRate, axis=1)
 
 ## get MR fold change
-masterDF[f"log2_methRateFC_{comparison}"] = masterDF.apply(methRateFoldChange, axis=1)
+masterDF[f"log2_methRateFC_{compareSamp}"] = masterDF.apply(methRateFoldChange, axis=1)
 
 ## get absolute values of the following columns
-absDeltaMethRate = list(map(abs, masterDF[f"delta_MethRate_{comparison}"]))
-masterDF[f"abs_delta_methRate_{comparison}"] = absDeltaMethRate
-absMethRateFC = list(map(abs, masterDF[f"log2_methRateFC_{comparison}"]))
-masterDF[f"abs_log2_methRateFC_{comparison}"] = absMethRateFC
+absDeltaMethRate = list(map(abs, masterDF[f"delta_MethRate_{compareSamp}"]))
+masterDF[f"abs_delta_methRate_{compareSamp}"] = absDeltaMethRate
+absMethRateFC = list(map(abs, masterDF[f"log2_methRateFC_{compareSamp}"]))
+masterDF[f"abs_log2_methRateFC_{compareSamp}"] = absMethRateFC
 
 if reps == True:
     # get combined p-value for each group
@@ -252,21 +253,21 @@ if reps == True:
         masterDF[f"numReps_{group}"] = masterDF.apply(countRepsPair, axis=1)
         masterDF[f"combined_p-value_mState_{group}"] = masterDF.apply(combinedPval, axis=1)
     ## get cochran-mantel-haenzsel pval column
-    masterDF[f"p-value_mState_{comparison}"] = masterDF.apply(cmhTest, axis=1)
+    masterDF[f"p-value_mState_{compareSamp}"] = masterDF.apply(cmhTest, axis=1)
 else:
     # skip combined pval since no replicates
     for group in groups:
         masterDF[f"combined_p-value_mState_{group}"] = np.nan
     ## get fisher's exact test column
-    masterDF[f"p-value_mState_{comparison}"] = masterDF.apply(fet, axis=1)
+    masterDF[f"p-value_mState_{compareSamp}"] = masterDF.apply(fet, axis=1)
 
 ## get FDR values
-pVals = np.array(masterDF[f"p-value_mState_{comparison}"])
+pVals = np.array(masterDF[f"p-value_mState_{compareSamp}"])
 rankedP = stats.rankdata(pVals)
 fdr = pVals * len(pVals) / rankedP
 fdr[fdr > 1] = 1
 ## add FDR values to DF
-masterDF[f"FDR_mState_{comparison}"] = fdr
+masterDF[f"FDR_mState_{compareSamp}"] = fdr
 
 ## get combined FDR
 for group in groups:
