@@ -10,7 +10,7 @@ rule trim_se:
 	shell:
 		"""
 		mdoule purge
-		module load Cutlery
+		module load python3/3.6.3
 
 		cutadapt {adapterSeq} {opt_cutadapt} --trim-n \
 		-o ${{TMPDIR}}/__temp__.$$.1.fq.gz {input} 2>&1 | tee {log}
