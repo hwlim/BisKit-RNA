@@ -111,7 +111,9 @@ rule get_read_stats_rRNA:
 		"Counting reads used in mpileup for rRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
+		
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -348,6 +350,7 @@ rule get_read_stats_tRNA:
 		"Counting reads used in mpileup for tRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
@@ -587,6 +590,7 @@ rule get_read_stats_miRNA:
 		"Counting reads used in mpileup for miRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
@@ -820,6 +824,7 @@ rule get_read_stats_piRNA:
 		"Counting reads used in mpileup for piRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
@@ -1071,6 +1076,7 @@ rule get_read_stats_genome:
 		"Counting reads used in mpileup for genome... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
@@ -1187,6 +1193,7 @@ rule draw_distribution_plots_genome:
 	shell:
 		"""
 		module load python3/3.6.3
+
 		rBis.draw_dist_plots.py \
 		-c {input.cov} -o {sample_dir}/{wildcards.sampleName}/{genome_dir}/call_{coverage_filtered_dir} \
 		-n {wildcards.sampleName} \
@@ -1234,6 +1241,7 @@ rule get_align_stat_circRNA:
 	shell:
 		"""
 		module load python3/3.6.3
+
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
 		"""
 
@@ -1277,6 +1285,7 @@ rule feature_count_all_circRNA:
 	shell:
 		"""
 		module load python3/3.6.3
+
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
 		"""
 
@@ -1342,7 +1351,9 @@ rule get_read_stats_circRNA:
 		"Counting reads used in mpileup for circRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load samtools/1.18.0
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -1942,6 +1953,7 @@ rule draw_sig_m5C_proportion_per_sample:
 		desDir = sample_dir + "/{sampleName}/" + coverage_filtered_dir + "/" + per_sample_plot_dir
 	shell:
 		"""
+		module purge
 		module load R/4.1.1
 
 		mkdir -p {params.desDir}
@@ -1960,6 +1972,7 @@ rule draw_sig_m5C_proportion_all_samples:
 		"Drawing significant vs all m5C stats for all samples..."
 	shell:
 		"""
+		module purge
 		module load R/4.1.1
 
 		mkdir -p {plot_dir}
@@ -1982,6 +1995,7 @@ rule draw_categorizations_by_source_per_pairwise:
 		groupList = lambda wildcards: get_group(wildcards.diffPairName)
 	shell:
 		"""
+		module purge
 		module load R/4.1.1
 		rBis.drawCategorizationBySourcePerPairwise.r \
 		-o {compare_dir}/{wildcards.diffPairName}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/{per_pairwise_plot_dir}/Categorization_By_Source \
@@ -2013,6 +2027,7 @@ rule draw_categorizations_pairwise:
 		"Categorizing comparison between two samples..."
 	shell:
 		"""
+		module purge
 		module load R/4.1.1
 		rBis.drawCategorizationStatsPairwise.r \
 		-o {combined_compare_dir}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/Differential_Analysis_Categorization -m {mqc_dir}/Differential_Analysis_Categorization {input.categorizationStats}
@@ -2029,6 +2044,7 @@ rule draw_categorizations_per_pairwise_as_volcano:
 		desDir = compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/" + per_pairwise_plot_dir
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		mkdir -p {params.desDir}
@@ -2164,7 +2180,6 @@ rule draw_mbias_plot_genome:
 		module purge
 		module load samtools/1.18.0
 		module load python3/3.6.3
-		module load samtools/1.18.0
 
 		mkdir -p {mqc_dir}
 
