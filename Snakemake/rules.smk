@@ -9,6 +9,7 @@ rule trim_se:
 		trim_dir + "/{sampleName}.trim.log"
 	shell:
 		"""
+		mdoule purge
 		module load Cutlery
 
 		cutadapt {adapterSeq} {opt_cutadapt} --trim-n \
@@ -62,6 +63,7 @@ rule get_align_stat_rRNA:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
@@ -113,7 +115,7 @@ rule get_read_stats_rRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
-		
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -190,24 +192,24 @@ rule call_m5C_candidates_rRNA:
 		source activate BisKit
 
 		mkdir -p {params.desDir}
+		tempDir=${{TMPDIR}}/call_rRNA_$$_$RANDOM
+		mkdir -p $tempDir
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_rRNA.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_rRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_rRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_rRNA.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_rRNA.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_rRNA.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_rRNA.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_rRNA.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_rRNA.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_rRNA.tsv \
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_mpileup_final_rRNA.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_mpileup_final_rRNA.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{rRNA_dir}/call_{coverage_filtered_dir} \
 		-m rRNA -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName} -u {species} -a {rRNA_fa} -r {genome_fa}
 
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_rRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_rRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_rRNA.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -220,7 +222,7 @@ rule draw_distribution_plots_rRNA:
 		"Drawing distribution plots for rRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 
 		rBis.draw_dist_plots.py \
@@ -270,7 +272,7 @@ rule get_align_stat_tRNA:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
@@ -315,6 +317,7 @@ rule feature_count_all_tRNA:
 		"Feature count all tRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
@@ -330,6 +333,7 @@ rule feature_count_uniq_tRNA:
 		"Feature count uniq tRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
@@ -352,6 +356,7 @@ rule get_read_stats_tRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -430,23 +435,24 @@ rule call_m5C_candidates_tRNA:
 		module load anaconda3
 		source activate BisKit
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_tRNA.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_tRNA.tsv
+		tempDir=${{TMPDIR}}/call_tRNA_$$_$RANDOM
+		mkdir -p $tempDir
+
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_tRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_tRNA.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_tRNA.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_tRNA.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_tRNA.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_tRNA.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_tRNA.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_tRNA.tsv \
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_mpileup_final_tRNA.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_mpileup_final_tRNA.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{tRNA_dir}/call_{coverage_filtered_dir} \
 		-m tRNA -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName} -u {species} -r {genome_fa}
 
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_tRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_tRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_tRNA.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -460,7 +466,7 @@ rule draw_distribution_plots_tRNA:
 
 	shell:
 		"""
-
+		module purge
 		module load python3/3.6.3
 
 		rBis.draw_dist_plots.py \
@@ -510,7 +516,9 @@ rule get_align_stat_miRNA:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
 		"""
 
@@ -555,7 +563,9 @@ rule feature_count_all_miRNA:
 		"Feature count all miRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load subread/2.0.3
+
 		rBis.featureCountsSample.sh -o {sample_dir}/{wildcards.sampleName}/{miRNA_dir}/featureCount_all -g {miRNA_gtf} -s "-M -O -T 1 -t mature -g gene_id --fracOverlap 0.8" {input.bam}
 		"""
 
@@ -571,7 +581,9 @@ rule feature_count_uniq_miRNA:
 		"Feature count uniq miRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load subread/2.0.3
+
 		rBis.featureCountsSample.sh -o {sample_dir}/{wildcards.sampleName}/{miRNA_dir}/featureCount_uniq -g {miRNA_gtf} -s "-O -T 1 -t mature -g gene_id --fracOverlap 0.8" {input.bam}
 		"""
 
@@ -592,6 +604,7 @@ rule get_read_stats_miRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -669,24 +682,24 @@ rule call_m5C_candidates_miRNA:
 		source activate BisKit
 
 		mkdir -p {params.desDir}
+		tempDir=${{TMPDIR}}/call_miRNA_$$_$RANDOM
+		mkdir -p $tempDir
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_miRNA.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_miRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_miRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_miRNA.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_miRNA.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_miRNA.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_miRNA.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_miRNA.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_miRNA.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_miRNA.tsv \
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_mpileup_final_miRNA.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_mpileup_final_miRNA.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{miRNA_dir}/call_{coverage_filtered_dir} \
 		-m miRNA -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName} -u {species} -r {genome_fa} -g {miRNA_gtf}
 
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_miRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_miRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_miRNA.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -700,7 +713,9 @@ rule draw_distribution_plots_miRNA:
 
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.draw_dist_plots.py \
 		-c {input.cov} -o {sample_dir}/{wildcards.sampleName}/{miRNA_dir}/call_{coverage_filtered_dir} \
 		-n {wildcards.sampleName} \
@@ -747,7 +762,9 @@ rule get_align_stat_piRNA:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
 		"""
 
@@ -790,7 +807,9 @@ rule feature_count_all_piRNA:
 		"Feature count all piRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
 		"""
 
@@ -804,7 +823,9 @@ rule feature_count_uniq_piRNA:
 		"Feature count uniq piRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
 		"""
 
@@ -826,6 +847,7 @@ rule get_read_stats_piRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -842,6 +864,7 @@ rule run_samtools_mpileup_all_piRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		samtools mpileup -B -f {piRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -867,6 +890,7 @@ rule run_samtools_mpileup_uniq_piRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		samtools mpileup -B -f {piRNA_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -902,23 +926,24 @@ rule call_m5C_candidates_piRNA:
 
 		mkdir -p {params.desDir}
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_piRNA.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_piRNA.tsv
+		tempDir=${{TMPDIR}}/call_piRNA_$$_$RANDOM
+		mkdir -p $tempDir
+
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_piRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_piRNA.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_piRNA.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_piRNA.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_piRNA.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_piRNA.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_piRNA.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_piRNA.tsv \
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_mpileup_final_piRNA.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_mpileup_final_piRNA.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{piRNA_dir}/call_{coverage_filtered_dir} \
 		-m piRNA -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName}  -u {species} -r {genome_fa}
 
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_piRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_piRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_piRNA.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -932,7 +957,9 @@ rule draw_distribution_plots_piRNA:
 
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.draw_dist_plots.py \
 		-c {input.cov} -o {sample_dir}/{wildcards.sampleName}/{piRNA_dir}/call_{coverage_filtered_dir} \
 		-n {wildcards.sampleName} \
@@ -981,7 +1008,9 @@ rule get_align_stat_genome:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
 		"""
 
@@ -1004,6 +1033,9 @@ rule post_process_bam_genome:
 		module purge
 		module load samtools/1.18.0
 
+		tempDir=${{TMPDIR}}/post_process_$$_$RANDOM
+		mkdir -p $tempDir
+
 		## split to forward strand
 		echo "making align.plus.bam."
 		samtools view -b -F 16 {input.bam} > {output.plusBam}
@@ -1017,14 +1049,12 @@ rule post_process_bam_genome:
 		## get align.uniq.bam
 		echo "making align.uniq.bam."
 		samtools view -H {input.bam} > {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt
-		samtools view {input.bam} | grep -w "NH:i:1" > $TMPDIR/{wildcards.sampleName}.genome.tmp
-		cat {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt $TMPDIR/{wildcards.sampleName}.genome.tmp > $TMPDIR/{wildcards.sampleName}.genome.tmp.sam
-		samtools view -bS $TMPDIR/{wildcards.sampleName}.genome.tmp.sam > {output.uniqBam}
+		samtools view {input.bam} | grep -w "NH:i:1" > ${{tempDir}}/{wildcards.sampleName}.genome.tmp
+		cat {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt ${{tempDir}}/{wildcards.sampleName}.genome.tmp > ${{tempDir}}/{wildcards.sampleName}.genome.tmp.sam
+		samtools view -bS ${{tempDir}}/{wildcards.sampleName}.genome.tmp.sam > {output.uniqBam}
 		samtools index {output.uniqBam}
 
-		rm {sample_dir}/{wildcards.sampleName}/{genome_dir}/Align/header.txt
-		rm $TMPDIR/{wildcards.sampleName}.genome.tmp
-		rm $TMPDIR/{wildcards.sampleName}.genome.tmp.sam
+		rm -rf $tempDir
 
 		"""
 
@@ -1040,7 +1070,9 @@ rule feature_count_all_genome:
 		"Feature count all genome... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load subread/2.0.3
+
 		rBis.featureCountsSample.sh -o {sample_dir}/{wildcards.sampleName}/{genome_dir}/featureCount_all -g {genome_bed} -s "-M -O -T 1 -t exon -g gene_name --fracOverlap 0.8" {input.bam}
 		"""
 
@@ -1056,7 +1088,9 @@ rule feature_count_uniq_genome:
 		"Feature count uniq genome... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load subread/2.0.3
+
 		rBis.featureCountsSample.sh -o {sample_dir}/{wildcards.sampleName}/{genome_dir}/featureCount_uniq -g {genome_bed} -s "-O -T 1 -t exon -g gene_name --fracOverlap 0.8" {input.bam}
 		"""
 
@@ -1078,6 +1112,7 @@ rule get_read_stats_genome:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -1094,6 +1129,7 @@ rule run_samtools_mpileup_all_genome:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		samtools mpileup -B -f {genome_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -1120,6 +1156,7 @@ rule run_samtools_mpileup_uniq_genome:
 		"""
 		module purge
 		module load samtools/1.18.0
+
 		samtools mpileup -B -f {genome_fa} \
 		--no-output-ins --no-output-del --no-output-ends --max-depth 10000 --min-BQ 30 --excl-flags 1540 \
 		{input.bam} \
@@ -1156,29 +1193,28 @@ rule call_m5C_candidates_genome:
 
 		mkdir -p {params.desDir}
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_genome.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_genome.tsv
+		tempDir=${{TMPDIR}}/call_genome_$$_$RANDOM
+		mkdir -p $tempDir
+
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_genome.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_genome.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_genome.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_genome.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_genome.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_genome.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_genome.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_genome.tsv \
 
-		gawk -F'\t' '{{ if (NR!=1) print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5 }}' $TMPDIR/{wildcards.sampleName}_mpileup_final_genome.tsv > $TMPDIR/{wildcards.sampleName}_{genome_dir}_1.seqContext_input.bed
-		bedtools intersect -loj -a $TMPDIR/{wildcards.sampleName}_{genome_dir}_1.seqContext_input.bed -b {genome_bed} > $TMPDIR/{wildcards.sampleName}_{genome_dir}_2.annotated.bed
+		gawk -F'\t' '{{ if (NR!=1) print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5 }}' ${{tempDir}}/{wildcards.sampleName}_mpileup_final_genome.tsv > ${{tempDir}}/{wildcards.sampleName}_{genome_dir}_1.seqContext_input.bed
+		bedtools intersect -loj -a ${{tempDir}}/{wildcards.sampleName}_{genome_dir}_1.seqContext_input.bed -b {genome_bed} > ${{tempDir}}/{wildcards.sampleName}_{genome_dir}_2.annotated.bed
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_{genome_dir}_2.annotated.bed \
-		-y $TMPDIR/{wildcards.sampleName}_mpileup_final_genome.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_{genome_dir}_2.annotated.bed \
+		-y ${{tempDir}}/{wildcards.sampleName}_mpileup_final_genome.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{genome_dir}/call_{coverage_filtered_dir} \
 		-m genome -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName} -u {species} -r {genome_fa}
 
-		rm $TMPDIR/{wildcards.sampleName}_{genome_dir}_1.seqContext_input.bed
-		rm $TMPDIR/{wildcards.sampleName}_{genome_dir}_2.annotated.bed
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_genome.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_genome.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_genome.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -1192,6 +1228,7 @@ rule draw_distribution_plots_genome:
 
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.draw_dist_plots.py \
@@ -1240,6 +1277,7 @@ rule get_align_stat_circRNA:
 		"Getting alignment stats... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.alignStat_perSample.py -s {input.summary} -o {output.alignStats} -n {wildcards.sampleName}
@@ -1284,6 +1322,7 @@ rule feature_count_all_circRNA:
 		"Feature count all circRNA_dir... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
@@ -1299,7 +1338,9 @@ rule feature_count_uniq_circRNA:
 		"Feature count uniq piRNA... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.count_chromosomes.py -b {input.bam} > {output.cnt}
 		"""
 
@@ -1329,7 +1370,9 @@ rule merge_featureCounts_by_sample:
 		"Merging all featureCounts for [{wildcards.sampleName}]..."
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.merge_featureCounts_by_sample.py \
 		-f {input.featureCounts} \
 		-o {sample_dir}/{wildcards.sampleName}/featureCounts.tsv \
@@ -1353,7 +1396,7 @@ rule get_read_stats_circRNA:
 		"""
 		module purge
 		module load samtools/1.18.0
-
+		
 		rBis.getReadStats.sh -o {output.readStats} {input.bam} {input.plusBam} {input.minusBam} {wildcards.sampleName} {input.unalignedFQ}
 		"""
 
@@ -1431,24 +1474,24 @@ rule call_m5C_candidates_circRNA:
 		source activate BisKit
 
 		mkdir -p {params.desDir}
+		tempDir=${{TMPDIR}}/call_circRNA_$$_$RANDOM
+		mkdir -p $tempDir
 
-		rBis.mpileup_getStrand.py -c {input.tableAll} -o $TMPDIR/{wildcards.sampleName}_mpileup_all_circRNA.tsv
-		rBis.mpileup_getStrand.py -c {input.tableUniq} -o $TMPDIR/{wildcards.sampleName}_mpileup_uniq_circRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableAll} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_all_circRNA.tsv
+		rBis.mpileup_getStrand.py -c {input.tableUniq} -o ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_circRNA.tsv
 
 		rBis.mpileup_mergeTables.py \
-		-a $TMPDIR/{wildcards.sampleName}_mpileup_all_circRNA.tsv \
-		-u $TMPDIR/{wildcards.sampleName}_mpileup_uniq_circRNA.tsv \
-		-o $TMPDIR/{wildcards.sampleName}_mpileup_final_circRNA.tsv \
+		-a ${{tempDir}}/{wildcards.sampleName}_mpileup_all_circRNA.tsv \
+		-u ${{tempDir}}/{wildcards.sampleName}_mpileup_uniq_circRNA.tsv \
+		-o ${{tempDir}}/{wildcards.sampleName}_mpileup_final_circRNA.tsv \
 
 		rBis.mpileup_call_m5C.py \
-		-v {params.cov} -c $TMPDIR/{wildcards.sampleName}_mpileup_final_circRNA.tsv \
+		-v {params.cov} -c ${{tempDir}}/{wildcards.sampleName}_mpileup_final_circRNA.tsv \
 		-o {sample_dir}/{wildcards.sampleName}/{circRNA_dir}/call_{coverage_filtered_dir} \
 		-m circRNA -s {sig_thresh_call} -t {sig_type_call} -l {lookup_table} -n {min_C_count} \
 		-e {wildcards.sampleName} -u {species} -r {genome_fa}
 
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_all_circRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_uniq_circRNA.tsv
-		rm $TMPDIR/{wildcards.sampleName}_mpileup_final_circRNA.tsv
+		rm -rf $tempDir
 
 		"""
 
@@ -1462,6 +1505,7 @@ rule draw_distribution_plots_circRNA:
 
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.draw_dist_plots.py \
@@ -1480,7 +1524,9 @@ rule merge_all_featureCounts:
 		"Merging all featureCounts..."
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.merge_all_featureCounts.py \
 		-f {input.featureCounts} \
 		-o {sample_dir}/featureCounts.tsv
@@ -1508,6 +1554,7 @@ rule merge_align_stats:
 		"Merging alignment statistics per sample... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.mergeAlignStats.py \
@@ -1535,30 +1582,29 @@ rule merge_align_stats_for_all_samples:
 		"Combining all alignment statistics by source..."
 	shell:
 		"""
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmprRNA.tsv
-		cat $TMPDIR/tmprRNA.tsv {input.rRNAstats} | sed -n 'p;n' > {output.rRNA_out}
-		rm $TMPDIR/tmprRNA.tsv
 
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmptRNA.tsv
-		cat $TMPDIR/tmptRNA.tsv {input.tRNAstats} | sed -n 'p;n' > {output.tRNA_out}
-		rm $TMPDIR/tmptRNA.tsv
+		tempDir=${{TMPDIR}}/merge_align_stats_$$_$RANDOM
+		mkdir -p $tempDir
 
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmpmiRNA.tsv
-		cat $TMPDIR/tmpmiRNA.tsv {input.miRNAstats} | sed -n 'p;n' > {output.miRNA_out}
-		rm $TMPDIR/tmpmiRNA.tsv
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmprRNA.tsv
+		cat ${{tempDir}}/tmprRNA.tsv {input.rRNAstats} | sed -n 'p;n' > {output.rRNA_out}
 
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmppiRNA.tsv
-		cat $TMPDIR/tmppiRNA.tsv {input.piRNAstats} | sed -n 'p;n' > {output.piRNA_out}
-		rm $TMPDIR/tmppiRNA.tsv
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmptRNA.tsv
+		cat ${{tempDir}}/tmptRNA.tsv {input.tRNAstats} | sed -n 'p;n' > {output.tRNA_out}
 
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmpgenome.tsv
-		cat $TMPDIR/tmpgenome.tsv {input.genomeStats} | sed -n 'p;n' > {output.genome_out}
-		rm $TMPDIR/tmpgenome.tsv
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmpmiRNA.tsv
+		cat ${{tempDir}}/tmpmiRNA.tsv {input.miRNAstats} | sed -n 'p;n' > {output.miRNA_out}
 
-		echo | awk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" '{{ print z"\t"a"\t"c"\t"e }}' > $TMPDIR/tmpcircRNA.tsv
-		cat $TMPDIR/tmpcircRNA.tsv {input.circRNAstats} | sed -n 'p;n' > {output.circRNA_out}
-		rm $TMPDIR/tmpcircRNA.tsv
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmppiRNA.tsv
+		cat ${{tempDir}}/tmppiRNA.tsv {input.piRNAstats} | sed -n 'p;n' > {output.piRNA_out}
 
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmpgenome.tsv
+		cat ${{tempDir}}/tmpgenome.tsv {input.genomeStats} | sed -n 'p;n' > {output.genome_out}
+
+		gawk -vz="Sample" -va="Uniquely Aligned" -vc="Multi-Aligned" -ve="Unaligned" 'BEGIN {{ print z"\t"a"\t"c"\t"e }}' > ${{tempDir}}/tmpcircRNA.tsv
+		cat ${{tempDir}}/tmpcircRNA.tsv {input.circRNAstats} | sed -n 'p;n' > {output.circRNA_out}
+
+		rm -rf $tempDir
 		"""
 
 rule draw_read_stratification:
@@ -1577,8 +1623,8 @@ rule draw_read_stratification:
 		desDir = sample_dir + "/{sampleName}/" + coverage_filtered_dir + per_sample_plot_dir
 	shell:
 		"""
-
-		module load R/4.1.1
+		module purge
+		module load R/4.4.0
 
 		mkdir -p {params.desDir}
 
@@ -1603,7 +1649,8 @@ rule draw_m5C_stratification:
 		desDir = sample_dir + "/{sampleName}/" + coverage_filtered_dir + per_sample_plot_dir
 	shell:
 		"""
-		module load R/4.1.1
+		module purge
+		module load R/4.4.0
 
 		mkdir -p {params.desDir}
 
@@ -1629,7 +1676,8 @@ rule draw_read_stratification_bar:
 		"Drawing read stratification for all samples..."
 	shell:
 		"""
-		module load R/4.1.1
+		module purge
+		module load R/4.4.0
 
 		mkdir -p {plot_dir} {mqc_dir}
 
@@ -1651,7 +1699,8 @@ rule draw_m5C_stratification_bar:
 		"Drawing m5C stratification for all samples..."
 	shell:
 		"""
-		module load R/4.1.1
+		module purge
+		module load R/4.4.0
 
 		rBis.drawM5CstratBarPlotAllSamples.r \
 		-s {sig_thresh_call} -t {sig_type_call} -r {mr_thresh} -c {cov_thresh} \
@@ -1679,6 +1728,7 @@ rule merge_call_stats:
 		"Merging call statistics per sample... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		rBis.mergeCallStats.py \
@@ -1720,53 +1770,46 @@ rule merge_call_stats_for_all_samples:
 		"""
 		mkdir -p {mqc_dir}
 		
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_rRNACallStats.tsv
-		cat $TMPDIR/$$_rRNACallStats.tsv {input.rRNAstats} | sed -n 'p;n' > {output.rRNA_out}
+		tempDir=${{TMPDIR}}/merge_call_stats_$$_$RANDOM
+		mkdir -p $tempDir
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_rRNACallStatsS.tsv
-		cat $TMPDIR/$$_rRNACallStatsS.tsv {input.rRNAstatsS} | sed -n 'p;n' > {output.rRNA_updown}
-		rm $TMPDIR/$$_rRNACallStats.tsv
-		rm $TMPDIR/$$_rRNACallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_rRNACallStats.tsv
+		cat ${{tempDir}}/$$_rRNACallStats.tsv {input.rRNAstats} | sed -n 'p;n' > {output.rRNA_out}
 
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_tRNACallStats.tsv
-		cat $TMPDIR/$$_tRNACallStats.tsv {input.tRNAstats} | sed -n 'p;n' > {output.tRNA_out}
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_rRNACallStatsS.tsv
+		cat ${{tempDir}}/$$_rRNACallStatsS.tsv {input.rRNAstatsS} | sed -n 'p;n' > {output.rRNA_updown}
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_tRNACallStatsS.tsv
-		cat $TMPDIR/$$_tRNACallStatsS.tsv {input.tRNAstatsS} | sed -n 'p;n' > {output.tRNA_updown}
-		rm $TMPDIR/$$_tRNACallStats.tsv
-		rm $TMPDIR/$$_tRNACallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_tRNACallStats.tsv
+		cat ${{tempDir}}/$$_tRNACallStats.tsv {input.tRNAstats} | sed -n 'p;n' > {output.tRNA_out}
 
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_miRNACallStats.tsv
-		cat $TMPDIR/$$_miRNACallStats.tsv {input.miRNAstats} | sed -n 'p;n' > {output.miRNA_out}
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_tRNACallStatsS.tsv
+		cat ${{tempDir}}/$$_tRNACallStatsS.tsv {input.tRNAstatsS} | sed -n 'p;n' > {output.tRNA_updown}
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_miRNACallStatsS.tsv
-		cat $TMPDIR/$$_miRNACallStatsS.tsv {input.miRNAstatsS} | sed -n 'p;n' > {output.miRNA_updown}
-		rm $TMPDIR/$$_miRNACallStats.tsv
-		rm $TMPDIR/$$_miRNACallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_miRNACallStats.tsv
+		cat ${{tempDir}}/$$_miRNACallStats.tsv {input.miRNAstats} | sed -n 'p;n' > {output.miRNA_out}
 
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_piRNACallStats.tsv
-		cat $TMPDIR/$$_piRNACallStats.tsv {input.piRNAstats} | sed -n 'p;n' > {output.piRNA_out}
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_miRNACallStatsS.tsv
+		cat ${{tempDir}}/$$_miRNACallStatsS.tsv {input.miRNAstatsS} | sed -n 'p;n' > {output.miRNA_updown}
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_piRNACallStatsS.tsv
-		cat $TMPDIR/$$_piRNACallStatsS.tsv {input.piRNAstatsS} | sed -n 'p;n' > {output.piRNA_updown}
-		rm $TMPDIR/$$_piRNACallStats.tsv
-		rm $TMPDIR/$$_piRNACallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_piRNACallStats.tsv
+		cat ${{tempDir}}/$$_piRNACallStats.tsv {input.piRNAstats} | sed -n 'p;n' > {output.piRNA_out}
 
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_genomeCallStats.tsv
-		cat $TMPDIR/$$_genomeCallStats.tsv {input.genomeStats} | sed -n 'p;n' > {output.genome_out}
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_piRNACallStatsS.tsv
+		cat ${{tempDir}}/$$_piRNACallStatsS.tsv {input.piRNAstatsS} | sed -n 'p;n' > {output.piRNA_updown}
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_genomeCallStatsS.tsv
-		cat $TMPDIR/$$_genomeCallStatsS.tsv {input.genomeStatsS} | sed -n 'p;n' > {output.genome_updown}
-		rm $TMPDIR/$$_genomeCallStats.tsv
-		rm $TMPDIR/$$_genomeCallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_genomeCallStats.tsv
+		cat ${{tempDir}}/$$_genomeCallStats.tsv {input.genomeStats} | sed -n 'p;n' > {output.genome_out}
 
-		echo | awk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" '{{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > $TMPDIR/$$_circRNACallStats.tsv
-		cat $TMPDIR/$$_circRNACallStats.tsv {input.circRNAstats} | sed -n 'p;n' > {output.circRNA_out}
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_genomeCallStatsS.tsv
+		cat ${{tempDir}}/$$_genomeCallStatsS.tsv {input.genomeStatsS} | sed -n 'p;n' > {output.genome_updown}
 
-		echo | awk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > $TMPDIR/$$_circRNACallStatsS.tsv
-		cat $TMPDIR/$$_circRNACallStatsS.tsv {input.circRNAstatsS} | sed -n 'p;n' > {output.circRNA_updown}
-		rm $TMPDIR/$$_circRNACallStats.tsv
-		rm $TMPDIR/$$_circRNACallStatsS.tsv
+		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_circRNACallStats.tsv
+		cat ${{tempDir}}/$$_circRNACallStats.tsv {input.circRNAstats} | sed -n 'p;n' > {output.circRNA_out}
+
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_circRNACallStatsS.tsv
+		cat ${{tempDir}}/$$_circRNACallStatsS.tsv {input.circRNAstatsS} | sed -n 'p;n' > {output.circRNA_updown}
+
+		rm -rf $tempDir
 
 		"""
 
@@ -1781,6 +1824,7 @@ rule merge_all_call_stats_for_multiqc:
 		"Combining call stats..."
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		mkdir -p {mqc_dir}
@@ -1815,9 +1859,8 @@ rule merge_call_results:
 		"Merging m5C candidates per sample... [{wildcards.sampleName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
-
-
 
 		rBis.mergeCandidates.py \
 		-c {input.candidates} \
@@ -1835,7 +1878,9 @@ rule draw_candidate_profile:
 		"drawing candidate profile... [{wildcards.sampleName}]"
 	shell:
 		"""
-		module load Cutlery
+		module purge
+		module load python3/3.6.3
+		module load ucsctools/v380
 
 		rBis.draw_candidate_profile.py \
 		-c {input.mergedCandidates} \
@@ -1881,6 +1926,7 @@ rule compare_candidates:
 		"Comparing candidates between two samples... [{wildcards.diffPairName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		mkdir -p {params.desDir}
@@ -1909,6 +1955,7 @@ rule categorize_comparisons:
 		"Categorizing comparison between two samples... [{wildcards.diffPairName}]"
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		mkdir -p {params.desDir}
@@ -1934,7 +1981,9 @@ rule merge_all_pairwise:
 		"Combining all sample comparisons..."
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
+
 		rBis.merge_all_pairwise.py \
 		-p {input.pairwises} \
 		-o {combined_compare_dir}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh} \
@@ -1954,7 +2003,7 @@ rule draw_sig_m5C_proportion_per_sample:
 	shell:
 		"""
 		module purge
-		module load R/4.1.1
+		module load R/4.4.0
 
 		mkdir -p {params.desDir}
 
@@ -1973,7 +2022,7 @@ rule draw_sig_m5C_proportion_all_samples:
 	shell:
 		"""
 		module purge
-		module load R/4.1.1
+		module load R/4.4.0
 
 		mkdir -p {plot_dir}
 
@@ -1996,7 +2045,8 @@ rule draw_categorizations_by_source_per_pairwise:
 	shell:
 		"""
 		module purge
-		module load R/4.1.1
+		module load R/4.4.0
+
 		rBis.drawCategorizationBySourcePerPairwise.r \
 		-o {compare_dir}/{wildcards.diffPairName}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/{per_pairwise_plot_dir}/Categorization_By_Source \
 		-g {params.groupList} \
@@ -2012,9 +2062,15 @@ rule combine_all_categorization_tables:
 		"Combining all pairwise categorizations..."
 	shell:
 		"""
-		echo | awk -vs="Comparisons" -va="UP" -vb="DOWN" -ve="UNCHANGED" -vc="uniq1" -vd="uniq2" '{{ print s"\t"a"\t"b"\t"e"\t"c"\t"d }}' > $TMPDIR/tmp.tsv
-		cat $TMPDIR/tmp.tsv {input.categorization} > {output.table}
-		rm $TMPDIR/tmp.tsv
+
+		tempDir=${{TMPDIR}}/combine_cat_tables_$$_$RANDOM
+		mkdir -p $tempDir
+
+		gawk -vs="Comparisons" -va="UP" -vb="DOWN" -ve="UNCHANGED" -vc="uniq1" -vd="uniq2" 'BEGIN {{ print s"\t"a"\t"b"\t"e"\t"c"\t"d }}' > ${{tempDir}}/tmp.tsv
+		cat ${{tempDir}}/tmp.tsv {input.categorization} > {output.table}
+		
+		rm -rf $tempDir
+
 		"""
 
 rule draw_categorizations_pairwise:
@@ -2028,7 +2084,8 @@ rule draw_categorizations_pairwise:
 	shell:
 		"""
 		module purge
-		module load R/4.1.1
+		module load R/4.4.0
+
 		rBis.drawCategorizationStatsPairwise.r \
 		-o {combined_compare_dir}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/Differential_Analysis_Categorization -m {mqc_dir}/Differential_Analysis_Categorization {input.categorizationStats}
 		"""
@@ -2083,6 +2140,7 @@ rule separate_and_merge_categorizations_by_source:
 		"re-merging categorization stats..."
 	shell:
 		"""
+		module purge
 		module load python3/3.6.3
 
 		mkdir -p {mqc_dir}
@@ -2101,7 +2159,8 @@ rule get_deltaMR_dist_lines:
 		"Create coordinates for delta methRate distribution line plot for MultiQC..."
 	shell:
 		"""
-		module load R/4.1.1
+		module purge
+		module load R/4.4.0
 
 		mkdir -p {mqc_dir}
 

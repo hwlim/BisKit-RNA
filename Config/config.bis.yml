@@ -12,23 +12,26 @@ diff_pair_list:
         - Sample2
         - Sample3
 
-## parameters
-params:
+## path to sample file
+src_sampleInfo: "sample.tsv"
 
+directory:
     ## reference directory that contains reference FA files, index, bed etc.
-    ref_dir: "/Genomes/mm10"
+    ref_dir: "/data/limlab/Resource/BisKit_Reference/mm10"
 
-    ## adapter trimming; set as "NULL" if you do not want to perform trimming.
-    ## Add the '-a' in front of the adapter as shown in the default setting below.
-    ## Multiple adapter sequences can be added by adding the '-a' flag in front of the sequence as shown in the default setting below. 
-    ## illumina universal adapter = "-a AGATCGGAAGAGC"
-    ## illumina small RNA adapter = "-a TGGAATTCTCGGGTGCCAAGG"
-    ## Nextera adapter for ATAC-seq or Cut&Tag = "-a CTGTCTCTTATA"
-    adapter: ["AGATCGGAAGAGC", "TGGAATTCTCGGGTGCCAAGG"]
+    ## output directory names; recommended to use default
+    fastq_dir: "0.Fastq"
+    trim_dir: "0.Fastq.Trim"
+    sample_dir: "1.Sample"
+    plot_dir: "1.Sample_Plots"
+    compare_dir: "2.Diff"
+    combined_compare_dir: "3.Final_Results"
+    mqc_dir: "4.multiQC"
 
-    ## additional options for cutadapt; follow cutadapt syntax. Leave as empty quotes if no additional options are being used.
-    ## default parameters: minimum fragment length 18, minimum quality 20 for quality trimming
-    opt_cutadapt: "--minimum-length 18 -q 20"
+
+options:
+    ## deduplication
+    doDedup: False
 
     ## softclipping during alignment; enter 'True' to allow soft-clipping or 'False' to prevent soft-clipping, without the quotation marks
     soft_clipping: True
@@ -39,10 +42,22 @@ params:
     ## Set RNA spliced alignment
     Allow_RNA_spliced_alignment: False
 
-    ## deduplication
-    doDedup: False
+
+## parameters
+params:
+    ## adapter trimming; set adapter: "NULL" if you do not want to perform trimming.
+    ## Multiple adapter sequences can be added; check the default entry below
+    ## illumina universal adapter = "AGATCGGAAGAGC"
+    ## illumina small RNA adapter = "TGGAATTCTCGGGTGCCAAGG"
+    ## Nextera adapter for ATAC-seq or Cut&Tag = "CTGTCTCTTATA"
+    adapter: ["AGATCGGAAGAGC", "TGGAATTCTCGGGTGCCAAGG"]
+
+    ## additional options for cutadapt; follow cutadapt syntax. Leave as empty quotes if no additional options are being used.
+    ## default parameters: minimum fragment length 18, minimum quality 20 for quality trimming
+    opt_cutadapt: "--minimum-length 18 -q 20"
 
     ## Regular expressions for target chromosomes
+    chrRegex: "^chr[0-9XY]+$"
     chrRegexTarget: "^chr[0-9XY]+$"
 
     ## threshold for minimum coverage for a C to be considered a potential candidate
