@@ -56,26 +56,27 @@ unalignedFQ=$5
 ## count all reads
 bamSortedByFreq=${TMPDIR}/bam_sorted_$$_$RANDOM
 samtools view $bam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $bamSortedByFreq
-totalReads=$(wc -l $bamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
-totalUniq=$(cut -f1 $bamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
-totalMulti=$(cut -f1 $bamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
+totalReads=$(wc -l "$bamSortedByFreq" | cut -d' ' -f1 || true ) || { echo "Error counting total reads in all bam"; exit 1; }
+totalUniq=$(cut -f1 "$bamSortedByFreq" | grep -w "1" | wc -l || true ) || { echo "Error counting total unique reads in all bam"; exit 1; }
+totalMulti=$(cut -f1 "$bamSortedByFreq" | grep -vw "1" | wc -l || true ) || { echo "Error counting total multi-aligned reads in all bam"; exit 1; }
 
 ## count plus reads
 plusBamSortedByFreq=${TMPDIR}/plusBam_sorted_$$_$RANDOM
 samtools view $plusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $plusBamSortedByFreq
-totalPlusReads=$(wc -l $plusBamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
-plusUniq=$(cut -f1 $plusBamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
-plusMulti=$(cut -f1 $plusBamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
+totalPlusReads=$(wc -l "$plusBamSortedByFreq" | cut -d' ' -f1 || true ) || { echo "Error counting total reads in plus bam"; exit 1; }
+plusUniq=$(cut -f1 "$plusBamSortedByFreq" | grep -w "1" | wc -l || true ) || { echo "Error counting total unique reads in plus bam"; exit 1; }
+plusMulti=$(cut -f1 "$plusBamSortedByFreq" | grep -vw "1" | wc -l || true ) || { echo "Error counting total multi-aligned reads in plus bam"; exit 1; }
+
 
 ## count minus reads
 minusBamSortedByFreq=${TMPDIR}/minusBam_sorted_$$_$RANDOM
 samtools view $minusBam | cut -f1 | ${BISKIT_PATH}/Scripts/sortByFreq.sh > $minusBamSortedByFreq
-totalMinusReads=$(wc -l $minusBamSortedByFreq | cut -d' ' -f1 ) || { echo "Error"; exit 1; }
-minusUniq=$(cut -f1 $minusBamSortedByFreq | grep -w "1" | wc -l ) || { echo "Error"; exit 1; }
-minusMulti=$(cut -f1 $minusBamSortedByFreq | grep -vw "1" | wc -l ) || { echo "Error"; exit 1; }
+totalMinusReads=$(wc -l "$minusBamSortedByFreq" | cut -d' ' -f1 || true ) || { echo "Error counting total reads in minus bam"; exit 1; }
+minusUniq=$(cut -f1 "$minusBamSortedByFreq" | grep -w "1" | wc -l || true ) || { echo "Error counting total unique reads in minus bam"; exit 1; }
+minusMulti=$(cut -f1 "$minusBamSortedByFreq" | grep -vw "1" | wc -l || true ) || { echo "Error counting total multi-aligned reads in minus bam"; exit 1; }
 
 ## count unaligned
-unaligned=$( zcat $unalignedFQ | wc -l) || { echo "Error"; exit 1; }
+unaligned=$( zcat "$unalignedFQ" | wc -l || true ) || { echo "Error counting unaligned reads"; exit 1; }
 
 echo totalReads: $totalReads
 echo totalUniq: $totalMulti
@@ -89,9 +90,9 @@ echo minusMulti: $minusMulti
 echo unaligned: $unaligned
 
 ## write to output file
-echo | awk -vs="$sampleName" -va="totalReadsRegardlessOfStrand" -ve="totalUniqAlignedRegardlessOfStrand" -vf="totalMultiAlignedRegardlessOfStrand" -vb="totalReads" -vc="strandUniq" -vd="strandMulti" -vg="unaligned" '{{ print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }}' > ${des}
-echo | awk -vs="plus" -va="$totalReads" -ve="$totalUniq" -vf="$totalMulti" -vb="$totalPlusReads" -vc="$plusUniq" -vd="$plusMulti" -vg="$unaligned" '{{ print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }}' >> ${des}
-echo | awk -vs="minus" -va="$totalReads" -ve="$totalUniq" -vf="$totalMulti" -vb="$totalMinusReads" -vc="$minusUniq" -vd="$minusMulti" -vg="$unaligned" '{{ print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }}' >> ${des}
+gawk -vs="$sampleName" -va="totalReadsRegardlessOfStrand" -ve="totalUniqAlignedRegardlessOfStrand" -vf="totalMultiAlignedRegardlessOfStrand" -vb="totalReads" -vc="strandUniq" -vd="strandMulti" -vg="unaligned" 'BEGIN { print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }' > ${des}
+gawk -vs="plus" -va="$totalReads" -ve="$totalUniq" -vf="$totalMulti" -vb="$totalPlusReads" -vc="$plusUniq" -vd="$plusMulti" -vg="$unaligned" 'BEGIN { print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }' >> ${des}
+gawk -vs="minus" -va="$totalReads" -ve="$totalUniq" -vf="$totalMulti" -vb="$totalMinusReads" -vc="$minusUniq" -vd="$minusMulti" -vg="$unaligned" 'BEGIN { print s"\t"e"\t"f"\t"a"\t"b"\t"c"\t"d"\t"g }' >> ${des}
 
 rm $bamSortedByFreq
 rm $plusBamSortedByFreq

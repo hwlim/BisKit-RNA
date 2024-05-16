@@ -1,34 +1,6 @@
 ########################
 ## Basic parameters
-
-
-## Sample information file with five columns: id / name / group / fq1 / fq2
-src_sampleInfo	= "sample.tsv"
 cluster_yml		= os.environ["BISKIT_PATH"] + "/Snakemake/cluster.yml"
-
-## Regular expressions for chromosome names
-## Target chromosomes + spikein chromosome (if needed)
-## This is also useful in excluding all the scaffold and random chromosomes
-chrRegex	= "^chr[0-9XY]+$"
-
-
-#########################
-## Directories
-fastq_dir	= "0.Fastq"			# Directory containing fastq files
-trim_dir	= "0.Fastq.Trim"	# Directory for trimmed fastq files
-sample_dir 	= "1.Sample"
-plot_dir 	= "1.Sample_Plots"
-per_sample_plot_dir = "Plots"
-per_pairwise_plot_dir = "Plots"
-rRNA_dir 	= "1.rRNA"
-tRNA_dir 	= "2.tRNA"
-miRNA_dir 	= "3.miRNA"
-piRNA_dir	= "4.piRNA"
-genome_dir 	= "5.genome"
-circRNA_dir 	= "6.circRNA"
-compare_dir 	= "2.Diff"
-combined_compare_dir = "3.Final_Results"
-mqc_dir = "4.multiQC"
 mqc_yaml = os.environ["BISKIT_PATH"] + "/Config/MultiQC_config.yaml"
 
 ################################################
@@ -39,7 +11,6 @@ import pandas as pd
 import sys
 import os
 import yaml
-samples = pd.read_csv(src_sampleInfo, sep="\t", comment="#", na_filter=False)
 
 ## Cluster configuration
 with open(os.path.expanduser(cluster_yml), 'r') as fh:
@@ -61,8 +32,31 @@ except AttributeError:
 
 diffPairNameDict = config_pw["diff_pair_list"]
 
+## Sample information file with five columns: id / name / group / fq1 / fq2
+src_sampleInfo	= config_pw['src_sampleInfo']
+samples = pd.read_csv(src_sampleInfo, sep="\t", comment="#", na_filter=False)
+
+## Directories
+fastq_dir	= config_pw['directory']['fastq_dir']
+trim_dir	= config_pw['directory']['trim_dir']
+sample_dir 	= config_pw['directory']['sample_dir']
+plot_dir 	= config_pw['directory']['plot_dir']
+compare_dir = config_pw['directory']['compare_dir']
+combined_compare_dir = config_pw['directory']['combined_compare_dir']
+mqc_dir = config_pw['directory']['mqc_dir']
+
+per_sample_plot_dir= "Plots"
+per_pairwise_plot_dir= "Plots"
+rRNA_dir= "1.rRNA"
+tRNA_dir= "2.tRNA"
+miRNA_dir= "3.miRNA"
+piRNA_dir= "4.piRNA"
+genome_dir= "5.genome"
+circRNA_dir= "6.circRNA"
+
 ## parse parameters fron the config.bis.yml file
-ref_dir = config_pw['params']['ref_dir']
+ref_dir = config_pw['directory']['ref_dir']
+
 ## reference data
 species = ref_dir.split("/")[-1]
 rRNA_fa = f"{ref_dir}/rRNA/rRNA.fa"
@@ -95,17 +89,17 @@ sig_thresh_diff = config_pw['params']['statistical_threshold_diff']
 min_reps = config_pw['params']['minimum_replicates']
 min_C_count = config_pw['params']['minimum_C_count']
 coverage_filtered_dir = "cov"+str(cov_thresh)
-soft_clipping = config_pw['params']['soft_clipping']
+soft_clipping = config_pw['options']['soft_clipping']
 if soft_clipping == True:
 	soft_clip = ''
 else:
 	soft_clip = '--no-softclip'
-Allow_genome_spliced_alignment = config_pw['params']['Allow_genome_spliced_alignment']
+Allow_genome_spliced_alignment = config_pw['options']['Allow_genome_spliced_alignment']
 if Allow_genome_spliced_alignment == True:
 	genome_splice = ''
 else:
 	genome_splice = '--no-spliced-alignment'
-Allow_RNA_spliced_alignment = config_pw['params']['Allow_RNA_spliced_alignment']
+Allow_RNA_spliced_alignment = config_pw['options']['Allow_RNA_spliced_alignment']
 if Allow_RNA_spliced_alignment == True:
 	RNA_splice = ''
 else:
@@ -123,9 +117,10 @@ else:
 	doTrim = False
 
 ## Deduplication
-do_dedup = config_pw['params']['doDedup']
+do_dedup = config_pw['options']['doDedup']
 
 ## Regular expressions for chromosome names
+chrRegex	= config_pw['params']['chrRegex']
 chrRegexTarget	= config_pw['params']['chrRegexTarget']
 
 #################################################
@@ -147,6 +142,7 @@ if doTrim:
 	trimming = [trim]
 else:
 	trimming = []
+
 
 rule all:
 	input:
