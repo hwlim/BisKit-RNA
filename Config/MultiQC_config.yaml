@@ -208,8 +208,8 @@ custom_data:
     parent_name: "Call Statistics"
   sigcall:
     parent_id: Call_Stats
-    section_name: "All Call Stats (Plot)"
-    description: "All Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "All Call Counts (Plot)"
+    description: "All Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   allcallTable:
     parent_id: Call_Stats
@@ -220,8 +220,8 @@ custom_data:
       format: '{:,.0f}'
   rRNAcall:
     parent_id: Call_Stats
-    section_name: "rRNA Call Stats (Plot)"
-    description: "rRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "rRNA Call Counts (Plot)"
+    description: "rRNA Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   rRNAcallTable:
     parent_id: Call_Stats
@@ -232,8 +232,8 @@ custom_data:
       format: '{:,.0f}'
   tRNAcall:
     parent_id: Call_Stats
-    section_name: "tRNA Call Stats (Plot)"
-    description: "tRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "tRNA Call Counts (Plot)"
+    description: "tRNA Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   tRNAcallTable:
     parent_id: Call_Stats
@@ -244,8 +244,8 @@ custom_data:
       format: '{:,.0f}'
   miRNAcall:
     parent_id: Call_Stats
-    section_name: "miRNA Call Stats (Plot)"
-    description: "miRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "miRNA Call Counts (Plot)"
+    description: "miRNA Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   miRNAcallTable:
     parent_id: Call_Stats
@@ -256,8 +256,8 @@ custom_data:
       format: '{:,.0f}'
   piRNAcall:
     parent_id: Call_Stats
-    section_name: "piRNA Call Stats (Plot)"
-    description: "piRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "piRNA Call Counts (Plot)"
+    description: "piRNA Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   piRNAcallTable:
     parent_id: Call_Stats
@@ -268,8 +268,8 @@ custom_data:
       format: '{:,.0f}'
   genomecall:
     parent_id: Call_Stats
-    section_name: "Genome Call Stats (Plot)"
-    description: "Genome Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "Genome Call Counts (Plot)"
+    description: "Genome Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   genomecallTable:
     parent_id: Call_Stats
@@ -280,8 +280,8 @@ custom_data:
       format: '{:,.0f}'
   circRNAcall:
     parent_id: Call_Stats
-    section_name: "circRNA Call Stats (Plot)"
-    description: "circRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "circRNA Call Counts (Plot)"
+    description: "circRNA Call Counts by Sample (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   circRNAcallTable:
     parent_id: Call_Stats
