@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
-import re
-import sys
 import pandas as pd
-import numpy as np
 
 #parse command line arguments
 options = argparse.ArgumentParser(description="merge call statistics", usage="python merge_all_callStats.py [options] -s callStats1.tsv callStats2.tsv callStats3.tsv... -a callStatsAll1.tsv callStatsAll2.tsv ...")
