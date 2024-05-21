@@ -208,85 +208,85 @@ custom_data:
     parent_name: "Call Statistics"
   sigcall:
     parent_id: Call_Stats
-    section_name: "All Call Stats (Plot)"
-    description: "All Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "All Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for all sources (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   allcallTable:
     parent_id: Call_Stats
     section_name: "All Call Stats (Table)"
-    description: "All Call Stats Table by Sample"
+    description: "Call stats by sample for all sources"
     plot_type: 'table' 
     pconfig:
       format: '{:,.0f}'
   rRNAcall:
     parent_id: Call_Stats
-    section_name: "rRNA Call Stats (Plot)"
-    description: "rRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "rRNA Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for rRNA (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   rRNAcallTable:
     parent_id: Call_Stats
     section_name: "rRNA Call Stats (Table)"
-    description: "rRNA Call Stats Table by Sample"
+    description: "Call stats by sample for rRNA"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'
   tRNAcall:
     parent_id: Call_Stats
-    section_name: "tRNA Call Stats (Plot)"
-    description: "tRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "tRNA Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for tRNA (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   tRNAcallTable:
     parent_id: Call_Stats
     section_name: "tRNA Call Stats (Table)"
-    description: "tRNA Call Stats Table by Sample"
+    description: "Call stats by sample for tRNA"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'
   miRNAcall:
     parent_id: Call_Stats
-    section_name: "miRNA Call Stats (Plot)"
-    description: "miRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "miRNA Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for miRNA (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   miRNAcallTable:
     parent_id: Call_Stats
     section_name: "miRNA Call Stats (Table)"
-    description: "miRNA Call Stats Table by Sample"
+    description: "Call stats by sample for miRNA"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'
   piRNAcall:
     parent_id: Call_Stats
-    section_name: "piRNA Call Stats (Plot)"
-    description: "piRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "piRNA Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for piRNA (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   piRNAcallTable:
     parent_id: Call_Stats
     section_name: "piRNA Call Stats (Table)"
-    description: "piRNA Call Stats Table by Sample"
+    description: "Call stats by sample for piRNA"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'
   genomecall:
     parent_id: Call_Stats
-    section_name: "Genome Call Stats (Plot)"
-    description: "Genome Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "Genome Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for genome (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   genomecallTable:
     parent_id: Call_Stats
     section_name: "Genome Call Stats (Table)"
-    description: "Genome Call Stats Table by Sample"
+    description: "Call stats by sample for genome"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'
   circRNAcall:
     parent_id: Call_Stats
-    section_name: "circRNA Call Stats (Plot)"
-    description: "circRNA Call Stats by Sample (based on m5C candidates with at least 10 coverage only)"
+    section_name: "circRNA Call Counts (Plot)"
+    description: "Significant vs non-significant candidate count for circRNA (based on m5C candidates with at least 10 coverage only)"
     plot_type: 'bargraph'
   circRNAcallTable:
     parent_id: Call_Stats
     section_name: "circRNA Call Stats (Table)"
-    description: "circRNA Call Stats Table by Sample"
+    description: "Call stats by sample for circRNA"
     plot_type: 'table'
     pconfig:
       format: '{:,.0f}'

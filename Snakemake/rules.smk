@@ -1776,31 +1776,31 @@ rule merge_call_stats_for_all_samples:
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_rRNACallStats.tsv
 		cat ${{tempDir}}/$$_rRNACallStats.tsv {input.rRNAstats} | sed -n 'p;n' > {output.rRNA_out}
 
-		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_rRNACallStatsS.tsv
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_rRNACallStatsS.tsv
 		cat ${{tempDir}}/$$_rRNACallStatsS.tsv {input.rRNAstatsS} | sed -n 'p;n' > {output.rRNA_updown}
 
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_tRNACallStats.tsv
 		cat ${{tempDir}}/$$_tRNACallStats.tsv {input.tRNAstats} | sed -n 'p;n' > {output.tRNA_out}
 
-		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_tRNACallStatsS.tsv
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_tRNACallStatsS.tsv
 		cat ${{tempDir}}/$$_tRNACallStatsS.tsv {input.tRNAstatsS} | sed -n 'p;n' > {output.tRNA_updown}
 
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_miRNACallStats.tsv
 		cat ${{tempDir}}/$$_miRNACallStats.tsv {input.miRNAstats} | sed -n 'p;n' > {output.miRNA_out}
 
-		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_miRNACallStatsS.tsv
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_miRNACallStatsS.tsv
 		cat ${{tempDir}}/$$_miRNACallStatsS.tsv {input.miRNAstatsS} | sed -n 'p;n' > {output.miRNA_updown}
 
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_piRNACallStats.tsv
 		cat ${{tempDir}}/$$_piRNACallStats.tsv {input.piRNAstats} | sed -n 'p;n' > {output.piRNA_out}
 
-		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_piRNACallStatsS.tsv
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_piRNACallStatsS.tsv
 		cat ${{tempDir}}/$$_piRNACallStatsS.tsv {input.piRNAstatsS} | sed -n 'p;n' > {output.piRNA_updown}
 
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_genomeCallStats.tsv
 		cat ${{tempDir}}/$$_genomeCallStats.tsv {input.genomeStats} | sed -n 'p;n' > {output.genome_out}
 
-		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" '{{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_genomeCallStatsS.tsv
+		gawk -vz="Sample" -va="Significant Candidates" -vb="Non-Significant Candidates" 'BEGIN {{ print z"\t"a"\t"b }}' > ${{tempDir}}/$$_genomeCallStatsS.tsv
 		cat ${{tempDir}}/$$_genomeCallStatsS.tsv {input.genomeStatsS} | sed -n 'p;n' > {output.genome_updown}
 
 		gawk -vz="Sample" -vt="Total Candidates" -va=">= 10 cov" -vb=">= 0.1 MethRate" -vc="< {sig_thresh_call} {sig_type_call}" -vd="Significant Candidates" 'BEGIN {{ print z"\t"t"\t"a"\t"b"\t"c"\t"d }}' > ${{tempDir}}/$$_circRNACallStats.tsv
