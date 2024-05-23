@@ -42,6 +42,9 @@ options:
     ## Set RNA spliced alignment
     Allow_RNA_spliced_alignment: False
 
+    ## Count features:
+    runFeatureCounts: False
+
 
 ## parameters
 params:
