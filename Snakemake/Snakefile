@@ -138,28 +138,18 @@ sample_list = samples.Name.tolist()
 
 #########################
 ## Rules start
+
+## trimming
 if doTrim:
 	trim = expand(trim_dir + "/{sampleName}_se.trim.fq.gz", sampleName=sample_list)
 	trimming = [trim]
 else:
 	trimming = []
 
+## feature counts
 if runFeatureCounts:
-	tRNA_featureCount_all = expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_all.txt", sampleName=sample_list)
-	tRNA_featureCount_uniq = expand(sample_dir + "/{sampleName}/" + tRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list)
-	miRNA_featureCount_all = expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_all.txt", sampleName=sample_list)
-	miRNA_featureCount_uniq = expand(sample_dir + "/{sampleName}/" + miRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list)
-	piRNA_featureCount_all = expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_all.txt", sampleName=sample_list)
-	piRNA_featureCount_uniq = expand(sample_dir + "/{sampleName}/" + piRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list)
-	genome_featureCount_all = expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_all.txt", sampleName=sample_list)
-	genome_featureCount_uniq = expand(sample_dir + "/{sampleName}/" + genome_dir + "/featureCount_uniq.txt", sampleName=sample_list)
-	circRNA_featureCount_all = expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_all.txt", sampleName=sample_list)
-	circRNA_featureCount_uniq = expand(sample_dir + "/{sampleName}/" + circRNA_dir + "/featureCount_uniq.txt", sampleName=sample_list)
-	sample_featureCounts = expand(sample_dir + "/{sampleName}/featureCounts.tsv", sampleName=sample_list),
-	all_featureCounts = sample_dir + "/featureCounts.tsv",
-	featureCounts = [tRNA_featureCount_all, tRNA_featureCount_uniq, miRNA_featureCount_all, miRNA_featureCount_uniq,
-					 piRNA_featureCount_all, piRNA_featureCount_uniq, genome_featureCount_all, genome_featureCount_uniq,
-					 circRNA_featureCount_all, circRNA_featureCount_uniq, sample_featureCounts, all_featureCounts]
+	all_featureCounts = sample_dir + "/featureCounts.tsv"
+	featureCounts = [all_featureCounts]
 else:
 	featureCounts = []
 
@@ -278,6 +268,7 @@ rule all:
 		expand(plot_dir + "/Read_Stratification_Percentage{ext}", ext=[".pdf", ".png"]),
 		expand(mqc_dir + "/Read_Stratification_{suf}.tsv", suf = ["All", "Aligned"]),
 
+		## merge candidate categorization (UP v DOWN)
 		expand(mqc_dir + "/{src}_catStats.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
 		expand(mqc_dir + "/{src}_catStats_updown.tsv", src=["rRNA", "tRNA", "miRNA", "piRNA", "Genome", "circRNA"]),
 
