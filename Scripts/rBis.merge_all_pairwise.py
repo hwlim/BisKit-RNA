@@ -5,8 +5,6 @@ import numpy as np
 import argparse
 from pathlib import Path
 import scipy.stats as stats
-# import statistics
-# import math
 import ast
 pd.set_option('display.max_columns', None)
 
