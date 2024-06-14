@@ -578,9 +578,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   rRNAupdown-plot:
     UP:
@@ -589,9 +589,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   tRNAcat-plot:
     UP:
@@ -600,9 +600,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   tRNAupdown-plot:
     UP:
@@ -611,9 +611,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   miRNAcat-plot:
     UP:
@@ -622,9 +622,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   miRNAupdown-plot:
     UP:
@@ -633,9 +633,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   piRNAcat-plot:
     UP:
@@ -644,9 +644,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   piRNAupdown-plot:
     UP:
@@ -655,9 +655,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   genomecat-plot:
     UP:
@@ -666,9 +666,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   genomeupdown-plot:
     UP:
@@ -677,9 +677,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   circRNAcat-plot:
     UP:
@@ -688,9 +688,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
   circRNAupdown-plot:
     UP:
@@ -699,9 +699,9 @@ custom_plot_config:
       color: 'blue'
     UNCHANGED:
       color: 'grey'
-    UNIQ1:
+    uniq1:
       color: 'green'
-    UNIQ2:
+    uniq2:
       color: 'yellow'
 
 ignore_images: false

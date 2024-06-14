@@ -7,7 +7,8 @@ suppressPackageStartupMessages(library('data.table', quiet=TRUE))
 # command line option handling
 option_list <- list(
 	make_option(c("-o","--outPrefix"), default="m5cSignificant", help="Output prefix. default=m5cSignificant"),
-	make_option(c("-g","--groupList"), help="a string of groups separated by comma")
+	make_option(c("-g","--groupList"), help="a string of groups separated by comma"),
+	make_option(c("-n","--diffPairName"), help="diff pair name defined in config.yml")
 )
 parser <- OptionParser(usage = "%prog [options] <tsv>", option_list=option_list,
 			description = "Draw bar plot of proportion of significant m5C candidates per Source and output table.
@@ -31,6 +32,7 @@ opt=arguments$options
 outPrefix=opt$outPrefix
 samp1=strsplit( opt$groupList, "," )[[1]][1]
 samp2=strsplit( opt$groupList, "," )[[1]][2]
+diffPairName=opt$diffPairName
 
 ## x-axis
 sources = c()
@@ -223,7 +225,7 @@ counts = append(counts, c(uprRNA, downrRNA, unchangedrRNA, uniq1rRNA, uniq2rRNA,
 
 ## save table with all info
 tab = matrix(c( uprRNA, downrRNA, unchangedrRNA, uniq1rRNA, uniq2rRNA, uptRNA, downtRNA, unchangedtRNA, uniq1tRNA, uniq2tRNA, upmiRNA, downmiRNA, unchangedmiRNA, uniq1miRNA, uniq2miRNA, uppiRNA, downpiRNA, unchangedpiRNA, uniq1piRNA, uniq2piRNA, upGenome, downGenome, unchangedGenome, uniq1Genome, uniq2Genome, upcircRNA, downcircRNA, unchangedcircRNA, uniq1circRNA, uniq2circRNA ), ncol=5, byrow=TRUE)
-rownames(tab) = c( paste(compName, "rRNA"), paste(compName, "tRNA"), paste(compName, "miRNA"), paste(compName, "piRNA"), paste(compName, "Genome"), paste(compName, "circRNA") )
+rownames(tab) = c( paste(diffPairName, "rRNA"), paste(diffPairName, "tRNA"), paste(diffPairName, "miRNA"), paste(diffPairName, "piRNA"), paste(diffPairName, "Genome"), paste(diffPairName, "circRNA") )
 colnames(tab) = c( "UP", "DOWN", "UNCHANGED", "uniq1", "uniq2")
 tab = as.table(tab)
 write.table(tab, file=paste0(outPrefix, ".tsv"), quote=FALSE, sep='\t', col.names = FALSE)

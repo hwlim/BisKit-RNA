@@ -70,7 +70,7 @@ else:
 
 ## get up, down, unchanged, or unique
 def differential(row):
-    sampleDiff = row[(f'delta_MethRate_{compareSamp}')]
+    sampleDiff = row[(f'delta_methRate_{compareSamp}')]
     sampleAbsDiff = row[(f'abs_delta_methRate_{compareSamp}')]
     sampleFDR = row[(f'{sigType}_{compareSamp}')]
     result = ""
@@ -254,7 +254,7 @@ plt.savefig(outFile + '/Plots/methRate_log2foldChange_' + sigSave + '.png', dpi=
 plt.close()
 
 # delta methRate
-deltamr = np.array(masterDF["delta_MethRate_" + compareSamp])
+deltamr = np.array(masterDF["delta_methRate_" + compareSamp])
 deltamr = deltamr.astype(float)
 deltamrPlt = plt.hist(deltamr, bins = 100)
 deltamrPlt = plt.xlabel(f"Delta Methylation Rate ({sampleNames[1]}−{sampleNames[0]})")
@@ -264,7 +264,7 @@ plt.savefig(outFile + '/Plots/delta_methRate.png', dpi=300)
 plt.close()
 
 # delta methRate fdr
-deltamr = np.array(fdr["delta_MethRate_" + compareSamp])
+deltamr = np.array(fdr["delta_methRate_" + compareSamp])
 deltamr = deltamr.astype(float)
 deltamrPlt = plt.hist(deltamr, bins = 100)
 deltamrPlt = plt.xlabel(f"Delta Methylation Rate ({sampleNames[1]}−{sampleNames[0]})")

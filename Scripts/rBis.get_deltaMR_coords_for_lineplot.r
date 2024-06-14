@@ -30,7 +30,10 @@ n = length(srcL)
 for( src in srcL ){
 	statsTable <- read.table(file = src, sep = '\t', header = TRUE, comment.char="")
 
-    y_cols = grep("delta_MethRate_", names(statsTable))
+    # print("names(statsTable)")
+    # print(names(statsTable))
+
+    y_cols = grep("^delta_methRate_", names(statsTable))
     comparison = strsplit(src, "/")[[1]][2]
     deltaMRpos <- subset(statsTable[, y_cols], statsTable[, y_cols] > 0.05 )
     deltaMRneg <- subset(statsTable[, y_cols], statsTable[, y_cols] < -0.05 )
@@ -43,6 +46,15 @@ for( src in srcL ){
 # extract X and Y coordinates for each list
 xcoords <- list()
 ycoords <- list()
+
+print("distList")
+print(distList)
+
+print("srcL")
+print(srcL)
+
+print("n")
+print(n)
 
 for (i in 1:n) {
     density_i <- density(distList[[i]])

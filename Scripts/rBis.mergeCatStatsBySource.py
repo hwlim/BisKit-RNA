@@ -38,8 +38,8 @@ masterDF = masterDF.rename(columns={
     1: 'UP',
     2: 'DOWN',
     3: 'UNCHANGED',
-    4: 'UNIQ1',
-    5: 'UNIQ2'
+    4: 'uniq1',
+    5: 'uniq2'
 })
 
 ## split dataframe by Source
@@ -48,6 +48,6 @@ for Source, group in masterDF.groupby('Source'):
     group.to_csv(f'{outPrefix}/{Source}_catStats.tsv', sep = "\t", index=False)
 
     group = group.drop("UNCHANGED", axis=1)
-    group = group.drop("UNIQ1", axis=1)
-    group = group.drop("UNIQ2", axis=1)
+    group = group.drop("uniq1", axis=1)
+    group = group.drop("uniq2", axis=1)
     group.to_csv(f'{outPrefix}/{Source}_catStats_updown.tsv', sep = "\t", index=False)
