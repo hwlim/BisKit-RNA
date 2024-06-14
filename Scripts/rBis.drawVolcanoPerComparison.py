@@ -42,7 +42,7 @@ data = comparisonFile[comparisonFile[compName].isin(['DOWN', 'UP', 'UNCHANGED'])
 
 data["coords"] = data.apply(lambda row: f"{row['#SeqID']}:{row['refPos']}:{row['refStrand']}", axis=1)
 
-deltaMR = f"delta_MethRate_{compName}"
+deltaMR = f"delta_methRate_{compName}"
 sig = f"{sigType}_{compName}"
 
 

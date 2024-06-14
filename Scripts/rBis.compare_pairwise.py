@@ -60,6 +60,18 @@ for tsv in sampleCandidates:
 
 print(sampleNames)
 
+## get avg methylation rate by group
+def avgMethRate(row, group):
+    
+    methRates = []
+    
+    for sample in groups[group]:
+        methRates.append(row[f"methRate_{sample}"])
+        
+    arr = np.array(methRates)
+        
+    return float(np.mean(arr))
+
 ## get delta methylation rate
 def deltaMethRate(row):
     
@@ -235,14 +247,18 @@ for group in groups:
 
 
 ## compare
+## get avg methylation rate
+for group in groups:
+    masterDF[f"avg_methRate_{group}"] = masterDF.apply(lambda row: avgMethRate(row, group), axis=1)
+
 ## get delta methylation rate
-masterDF[f"delta_MethRate_{compareSamp}"] = masterDF.apply(deltaMethRate, axis=1)
+masterDF[f"delta_methRate_{compareSamp}"] = masterDF.apply(deltaMethRate, axis=1)
 
 ## get MR fold change
 masterDF[f"log2_methRateFC_{compareSamp}"] = masterDF.apply(methRateFoldChange, axis=1)
 
 ## get absolute values of the following columns
-absDeltaMethRate = list(map(abs, masterDF[f"delta_MethRate_{compareSamp}"]))
+absDeltaMethRate = list(map(abs, masterDF[f"delta_methRate_{compareSamp}"]))
 masterDF[f"abs_delta_methRate_{compareSamp}"] = absDeltaMethRate
 absMethRateFC = list(map(abs, masterDF[f"log2_methRateFC_{compareSamp}"]))
 masterDF[f"abs_log2_methRateFC_{compareSamp}"] = absMethRateFC

@@ -300,6 +300,7 @@ rule all:
 		mqc_dir + "/Volcano_Plots.png",
 
 		## combined compare results
+		combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/raw_all_sample_comparisons.tsv",
 		combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/all_sample_comparisons.tsv",
 
 		## get line graph coords for delta MethylRate distribution plot in MultiQC

@@ -1931,7 +1931,12 @@ rule compare_candidates:
 
 		mkdir -p {params.desDir}
 
-		rBis.compare_pairwise.py -c {input.candidates} -o {compare_dir}/{wildcards.diffPairName} -s {src_sampleInfo} -p {wildcards.diffPairName} -g {params.groupList} -m {min_reps}
+		rBis.compare_pairwise.py -c {input.candidates} \
+		-o {compare_dir}/{wildcards.diffPairName} \
+		-s {src_sampleInfo} \
+		-p {wildcards.diffPairName} \
+		-g {params.groupList} \
+		-m {min_reps}
 		"""
 
 def get_group(diffPairName):
@@ -1976,7 +1981,8 @@ rule merge_all_pairwise:
 	input:
 		pairwises = expand(compare_dir + "/{diffPairName}/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/categorized_pairwise_comparison.tsv", diffPairName=diffPairNameL),
 	output:
-		combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/all_sample_comparisons.tsv"
+		raw = combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/raw_all_sample_comparisons.tsv",
+		simple = combined_compare_dir + "/Cov"+ cov_thresh + "_" + sig_type_diff + sig_thresh_diff + "_Diff" + diff_thresh + "/all_sample_comparisons.tsv",
 	message:
 		"Combining all sample comparisons..."
 	shell:
@@ -2050,6 +2056,7 @@ rule draw_categorizations_by_source_per_pairwise:
 		rBis.drawCategorizationBySourcePerPairwise.r \
 		-o {compare_dir}/{wildcards.diffPairName}/Cov{cov_thresh}_{sig_type_diff}{sig_thresh_diff}_Diff{diff_thresh}/{per_pairwise_plot_dir}/Categorization_By_Source \
 		-g {params.groupList} \
+		-n {wildcards.diffPairName} \
 		{input.categorization}
 		"""
 

@@ -5,8 +5,6 @@ import numpy as np
 import argparse
 from pathlib import Path
 import scipy.stats as stats
-import statistics
-import math
 import ast
 pd.set_option('display.max_columns', None)
 
@@ -60,12 +58,25 @@ masterDF.reset_index(inplace=True)
 masterDF = masterDF.rename(columns = {'index':'SeqID'})
 
 ## splitting identifier to user-readable format
-masterDF[['#SeqID', 'refPos', 'refStrand', 'refBase', 'seqContext', 'genomicCoords', 'Source', 'gene_type', 'gene']] = masterDF["SeqID"].str.split(";", expand=True)
+masterDF[['SeqID', 'refPos', 'refStrand', 'refBase', 'seqContext', 'genomicCoords', 'Source', 'gene_type', 'gene']] = masterDF["SeqID"].str.split(";", expand=True)
 
-newCols = ['#SeqID', 'refPos', 'refStrand', 'refBase', 'seqContext', 'genomicCoords', 'Source', 'gene_type', 'gene', ]
-masterDF = masterDF[ newCols + [col for col in masterDF.columns if col not in newCols ] ]
+## move avg_methRate and methRate to the left
+avg_methRate_cols = [col for col in masterDF.columns if col.startswith('avg_methRate')]
+methRate_cols = [col for col in masterDF.columns if col.startswith('methRate') and col not in avg_methRate_cols]
+other_cols = [col for col in masterDF.columns if col not in avg_methRate_cols and col not in methRate_cols]
+
+# Create the new order of columns
+new_order = avg_methRate_cols + methRate_cols + other_cols
+
+# Reorder the DataFrame
+masterDF = masterDF[new_order]
+
+## move comparisons to the left
 masterDF = masterDF[ comparisons + [col for col in masterDF.columns if col not in comparisons ] ]
-masterDF = masterDF.drop(columns=['SeqID'])
+
+## reorder the rest of the columns
+newCols = ['Source', 'SeqID', 'refPos', 'refStrand', 'refBase', 'seqContext', 'genomicCoords', 'gene_type', 'gene',]
+masterDF = masterDF[ newCols + [col for col in masterDF.columns if col not in newCols ] ]
 
 masterDF[comparisons] = masterDF[comparisons].fillna("No Coverage")
 
@@ -86,6 +97,18 @@ for comp in comparisons:
 
     masterDF.rename(columns={comp : key_found}, inplace=True)
 
+
 ## save
-masterDF.to_excel(outFile + "/all_sample_comparisons.xlsx", index=False, header=True)
-masterDF.to_csv(outFile + "/all_sample_comparisons.tsv", index=False, sep="\t", header=True)
+masterDF.to_excel(outFile + "/raw_all_sample_comparisons.xlsx", index=False, header=True)
+masterDF.to_csv(outFile + "/raw_all_sample_comparisons.tsv", index=False, sep="\t", header=True)
+
+## make simplified version
+# List of substrings to search for
+substrings = ['cov', 'count', 'uniq', 'CI', 'mState', 'scores', 'delta', 'log2', 'abs', 'numReps', ]
+
+# Create a regular expression pattern from the substrings
+pattern = '|'.join(substrings)
+
+filtered_df = masterDF.loc[:, ~masterDF.columns.str.contains(pattern, case=False, regex=True)]
+filtered_df.to_excel(outFile + "/all_sample_comparisons.xlsx", index=False, header=True)
+filtered_df.to_csv(outFile + "/all_sample_comparisons.tsv", index=False, sep="\t", header=True)

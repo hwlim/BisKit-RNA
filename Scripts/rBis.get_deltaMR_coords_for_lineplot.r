@@ -30,7 +30,7 @@ n = length(srcL)
 for( src in srcL ){
 	statsTable <- read.table(file = src, sep = '\t', header = TRUE, comment.char="")
 
-    y_cols = grep("delta_MethRate_", names(statsTable))
+    y_cols = grep("^delta_methRate_", names(statsTable))
     comparison = strsplit(src, "/")[[1]][2]
     deltaMRpos <- subset(statsTable[, y_cols], statsTable[, y_cols] > 0.05 )
     deltaMRneg <- subset(statsTable[, y_cols], statsTable[, y_cols] < -0.05 )
