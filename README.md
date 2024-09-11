@@ -1,9 +1,14 @@
 # BisKit_CCHMC
 
-*BisKit* is a snakemake pipeline that allows the user to analyze bisulfite sequencing data. It is created by Chris Ahn and Dr. Hee Woong Lim from the LimLab in the BMI division at CCHMC.
-*BisKit* is for use only on the CCHMC HPC.
+*BisKit* is a snakemake pipeline that allows the user to analyze bisulfite sequencing data.
+*BisKit* is currently for use only on the CCHMC HPC.
 *BisKit* aligns reads sequentially to multiple RNA sources and outputs detailed alignment, read, and call statistics for each sample as well as pairwise comparison results between the input samples. The results are also summarized in the form of a MultiQC report.
 
+Developers
+
+- Christopher Ahn (CCHMC)
+- Hee Woong Lim (CCHMC)
+  
 <br/>
 <br/>
 
