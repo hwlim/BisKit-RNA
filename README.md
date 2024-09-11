@@ -1,4 +1,4 @@
-# BisKit_CCHMC
+# BisKit
 
 *BisKit* is a snakemake pipeline that allows the user to analyze bisulfite sequencing data.
 *BisKit* is currently for use only on the CCHMC HPC.
